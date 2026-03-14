@@ -121,7 +121,9 @@ export class LeetHeading extends LeetItem {
         let acRateFormatted = new String(data.acRate);
         acRateFormatted = acRateFormatted.match(percentFormat)[0];
 
-        this.children.push(new LeetColoredText(`Difficulty: ${data.difficulty}`, new vscode.ThemeColor("leet.lowacceptance")));
+        const difficultyItem = new LeetColoredText(`Difficulty: ${data.difficulty}`, undefined);
+        difficultyItem.resourceUri = vscode.Uri.parse(`leet-difficulty:/${encodeURIComponent(data.difficulty)}`);
+        this.children.push(difficultyItem);
         this.children.push(new LeetColoredText(`Acceptance Rate: ${acRateFormatted}%`, new vscode.ThemeColor("leet.lowacceptance")));
     }
 
@@ -154,5 +156,30 @@ export class LeetColoredText extends LeetItem {
         if (color)
             this.color = color;
 
+    }
+}
+
+export class DifficultyDecorationProvider {
+    constructor() {
+        this._onDidChangeFileDecorations = new vscode.EventEmitter();
+        this.onDidChangeFileDecorations = this._onDidChangeFileDecorations.event;
+    }
+
+    provideFileDecoration(uri) {
+        if (uri.scheme !== 'leet-difficulty') return undefined;
+
+        const difficulty = decodeURIComponent(uri.path.slice(1));
+
+        if (/easy/i.test(difficulty)) {
+            return { color: new vscode.ThemeColor('testing.iconPassed') };   // green
+        }
+        if (/medium/i.test(difficulty)) {
+            return { color: new vscode.ThemeColor('list.warningForeground') }; // yellow
+        }
+        if (/hard/i.test(difficulty)) {
+            return { color: new vscode.ThemeColor('testing.iconFailed') };   // red
+        }
+
+        return undefined;
     }
 }
