@@ -194,6 +194,4 @@ async function generateTests(problemDescription) {
     const cancelToken = new vscode.CancellationTokenSource();
     const response = await model.sendRequest(messages);
 
-
-
 }
