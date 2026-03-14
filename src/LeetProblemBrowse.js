@@ -180,7 +180,11 @@ export class LeetHeading extends LeetItem {
         this.problemData = data;;
 
         this.contextValue = "importable";
-        
+
+           this.resourceUri = vscode.Uri.parse(
+            `leet-difficulty:/${encodeURIComponent(data.difficulty)}`
+        );
+    
 
         const percentFormat = /\d{1,2}.\d\d/;
         
