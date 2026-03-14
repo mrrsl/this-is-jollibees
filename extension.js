@@ -27,7 +27,22 @@ export function activate(context) {
 
 	vscode.commands.registerCommand(
 		'leet.import-problem',
-		extRunner.importProblem.bind(extRunner)
+		(pdata) => extRunner.importProblem(pdata)
+	);
+
+	vscode.commands.registerCommand(
+		'leet.select-language',
+		(lang) => extRunner.selectLanguage(lang)
+	);
+
+	vscode.commands.registerCommand(
+		'leet.page-up',
+		() => extRunner.pageProblems(true)
+	);
+
+	vscode.commands.registerCommand(
+		'leet.page-down',
+		() => extRunner.pageProblems(false)
 	);
 
 	vscode.window.registerTreeDataProvider(

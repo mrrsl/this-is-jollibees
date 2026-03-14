@@ -26,9 +26,23 @@
         "title": "Run Leet Solution"
       },
       {
+        "command": "leet.select-language",
+        "title": "Language"
+      },
+      {
         "command": "leet.import-problem",
         "title": "Import this problem",
         "icon": "$(desktop-download)"
+      },
+      {
+        "command": "leet.page-down",
+        "title": "Down",
+        "icon": "$(chevron-down)"
+      },
+      {
+        "command": "leet.page-up",
+        "title": "Up",
+        "icon": "$(chevron-up)"
       }
     ],
     "viewsContainers": {
@@ -70,6 +84,22 @@
           "command": "leet.import-problem",
           "when": "viewItem == importable",
           "group": "inline"
+        }
+      ]
+      ,
+      "view/title": [
+        {
+          "command": "leet.page-up",
+          "when": "view == leet-browse-view",
+          "group": "navigation",
+          "arguments": [false]
+        },
+        {
+          "command": "leet.page-down",
+          "icon": "$(chevron-down)",
+          "when": "view == leet-browse-view",
+          "group": "navigation",
+          "arguments": [true]
         }
       ]
     },
