@@ -101,36 +101,36 @@ export class Engine {
 			return;
 		}
 
-    // per language configuration can be done here
-    const workspacePath = vscode.workspace.workspaceFolders[0].uri.fsPath;
-    const problemPath = path.join(workspacePath, clampFileName(this.problemData));
+		// per language configuration can be done here
+		const workspacePath = vscode.workspace.workspaceFolders[0].uri.fsPath;
+		const problemPath = path.join(workspacePath, clampFileName(this.problemData));
 
-    try {
-      	if (!fs.existsSync(problemPath)) {
-        	fs.mkdirSync(problemPath);
-      	}
-    } catch (error) {
-      	vscode.window.showErrorMessage(
-        	`Error creating ${clampFileName(this.problemData)} folder: ${error.message},`,
-      	);
-    }
-    const solutionPath = path.join(problemPath, "solution.js");
-    const selectedLanguage = this.problemData.codeSnippets.filter((cs) => cs.lang == "JavaScript");
-    const content = selectedLanguage[0].code;
-
-    //create solution file
-    try {
-		if (!fs.existsSync(solutionPath)) {
-        	await fs.promises.writeFile(solutionPath, content);
+		try {
+			if (!fs.existsSync(problemPath)) {
+				fs.mkdirSync(problemPath);
+			}
+		} catch (error) {
+			vscode.window.showErrorMessage(
+				`Error creating ${clampFileName(this.problemData)} folder: ${error.message},`,
+			);
 		}
-		vscode.window.showInformationMessage("Solution file created");
-    } catch (error) {
-		vscode.window.showErrorMessage(`Error creating solution file: ${error.message}`);
-    }
+		const solutionPath = path.join(problemPath, "solution.js");
+		const selectedLanguage = this.problemData.codeSnippets.filter((cs) => cs.lang == "JavaScript");
+		const content = selectedLanguage[0].code;
 
-    //update panel data
-    this.sendPanelData(this.problemData);
-  }
+		//create solution file
+		try {
+			if (!fs.existsSync(solutionPath)) {
+				await fs.promises.writeFile(solutionPath, content);
+			}
+			vscode.window.showInformationMessage("Solution file created");
+		} catch (error) {
+			vscode.window.showErrorMessage(`Error creating solution file: ${error.message}`);
+		}
+
+    	//update panel data
+    	this.sendPanelData(this.problemData);
+  	}
 
 	getPanelProvider() {
 		return this.panelDataProvider;
@@ -202,6 +202,14 @@ export class Engine {
 		const response = await model.sendRequest(messages);
 
 		return response;
+	}
+
+	/**
+	 * Handles tab change events so we know what we're working on
+	 * @param {vscode.TextEditor} editor 
+	 */
+	tabChangeHandler(editor) {
+		
 	}
 }
 

@@ -20,6 +20,8 @@ export function activate(context) {
 
     const extRunner = new Engine(context.extensionUri, "solution");
 
+	const tabChange = vscode.window.onDidChangeActiveTextEditor(editor => extRunner.tabChangeHandler(editor));
+
     vscode.commands.registerCommand(
         "leet.import-problem",
 		(p) => extRunner.importProblem(p)
