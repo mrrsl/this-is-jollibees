@@ -9,8 +9,6 @@ import { LeetProblemProvider, LeetHeading } from "./LeetProblemBrowse.js";
 
 import { ProblemDescriptionProvider } from "./problem-description/ProblemDescription.js";
 
-const fileNameLength = 20;
-
 /**
  * State manager for the extension. Determines if user is logged in and can access features like submitting runnable solutions
  */
@@ -173,5 +171,29 @@ export class Engine {
 }
 
 function clampFileName(problem) {
-	return problem.title.slice(0, fileNameLength).replace(" ", "") + problem.questionFrontendId;
+	return problem.title.replace(" ", "") + ("-") + problem.questionFrontendId;
+}
+
+async function generateTests(problemDescription) {
+    const models = await vscode.lm.selectChatModels({
+        vendor: 'copilot',
+        family: 'gpt-4o'
+        });
+
+    const model = models[0];
+    if (!model) {
+        vscode.window.showErrorMessage('No Copilot model available, unable to generate test cases.')
+        return;
+    }
+
+    const messages = [
+        vscode.LanguageModelChatMessage.User('You are a software engineer trying to create test cases for a leetcode problem to test all general and edge cases.'),
+        vscode.LanguageModelChatMessage.User('This is the problem description, generate me test cases for the following problem: ' + problemDescription)
+    ];
+
+    const cancelToken = new vscode.CancellationTokenSource();
+    const response = await model.sendRequest(messages);
+
+
+
 }
