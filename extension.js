@@ -10,10 +10,6 @@ import {
 } from './src/Engine.js'
 
 import {
-	LeetProblemProvider
-} from './src/LeetProblemBrowse.js'
-
-import {
 	SolutionRunnerProvider
 } from './src/solution-runner/SolutionRunner.js'
 
@@ -27,11 +23,11 @@ export function activate(context) {
 
 	console.log('extension active');
 
-	const extRunner = new Engine();
+	const extRunner = new Engine(context.extensionUri, "solution");
 
 	vscode.commands.registerCommand(
 		'leet.import-problem',
-		extRunner.importProblem
+		extRunner.importProblem.bind(extRunner)
 	);
 
 	vscode.window.registerTreeDataProvider(

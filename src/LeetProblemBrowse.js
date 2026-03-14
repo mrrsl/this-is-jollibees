@@ -22,21 +22,23 @@ export class LeetProblemProvider {
     /** @type {LeetCode} */
     lcQuery;
 
-    constructor() {
+    /**
+     * API object for querying Leetcode.
+     * 
+     * @param {LeetCode} api 
+     */
+    constructor(api) {
         this.visibleProblemList = [];
-        this.lcQuery = new LeetCode();
+        this.lcQuery = api;
     }
 
     /**
-     * 
-     * 
      * @param {LeetItem} element 
      * 
      * @returns {vscode.TreeItem}
      */
     getTreeItem(element) {
         return element;
-        
     }
 
     /**
@@ -63,9 +65,9 @@ export class LeetProblemProvider {
      */
     processProblemList(pList) {
 
-        for (const prob of pList.questions) {
-            this.visibleProblemList.push(new LeetHeading(prob.questionFrontendId, prob.title, prob));
-        }
+        this.visibleProblemList = pList.questions.map(prob =>
+            new LeetHeading(prob.questionFrontendId, prob.title, prob)
+        );
 
         return Promise.resolve(this.visibleProblemList);
     }

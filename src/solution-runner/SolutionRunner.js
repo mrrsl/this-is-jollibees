@@ -72,4 +72,13 @@ export class SolutionRunnerProvider {
     makePath(filename) {
         return vscode.Uri.joinPath(this.extensionRoot, "src", "solution-runner", filename);
     }
+
+    /**
+     * Sends data to the panel webview so it can update its contents for a different problem
+     * 
+     * @param {import("@leetnotion/leetcode-api").Problem} problem 
+     */
+    updateContents(problem) {
+        this.view.webview.postMessage(problem);
+    }
 }

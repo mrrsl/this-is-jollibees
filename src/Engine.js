@@ -5,10 +5,17 @@ import {
 
 import * as vscode from 'vscode';
 
+import fs from 'fs';
+import path from 'path';
+
 import {
     LeetProblemProvider,
     LeetHeading
-} from './LeetProblemBrowse.js'
+} from './LeetProblemBrowse.js';
+
+import {
+    SolutionRunnerProvider
+} from './solution-runner/SolutionRunner.js';
 
 /**
  * State manager for the extension. Determines if user is logged in and can access features like submitting runnable solutions
@@ -24,18 +31,28 @@ export class Engine {
     /** @type {vscode.TreeDataProvider} */
     sidePanelProvider
 
+    /** @type {string} Base name of solution source code file. */
+    solutionFile;
+
+    /** @type {import("@leetnotion/leetcode-api").Problem} Queried data for the current problem. */
+    problemData;
+
+    /** @type {SolutionRunnerProvider} Data provider for the bottom panel view. */
+    panelDataProvider;
+
     /**
      * 
      * Construct an engine with optional sign-in credentials
      * 
+     * @param {vscode.Uri} extensionRootUri Root path of the extension.
+     * @param {string} solutionfilename Name of the solution file to look for.
      * @param {string} [session] Optional LeetCode session id.
      * @param {string} [csrf] Optional LeetCode csrf token.
      */
-    constructor(session, csrf) {
+    constructor(extensionRootUri, solutionfilename, session, csrf) {
 
         this.authenticated = false;
-
-        this.sidePanelProvider = new LeetProblemProvider();
+        this.solutionFile = solutionfilename;
 
         if (session && csrf) {
 
@@ -47,6 +64,9 @@ export class Engine {
         else {
             this.apiEntry = new LeetCode();
         }
+
+        this.sidePanelProvider = new LeetProblemProvider(this.apiEntry);
+        this.panelDataProvider = new SolutionRunnerProvider(extensionRootUri);
     }
 
     /**
@@ -59,10 +79,50 @@ export class Engine {
         const slug = heading.getSlug();
         console.log("import commanded for", slug);
 
-        // Use entryApi to retrieve problem data using problem(slug), remember it is async
+        this.apiEntry.problem(slug)
+            .then(p => this.problemData = p)
+            .catch(err => vscode.window.showErrorMessage(`Error while loading '${heading.problemData.title}': ${err}`))
+            .then(this.createSolutionFile.bind(this));
     }
 
+    /**
+     * Getter for side panel data provider.
+     */
     getSidePanelProvider() {
         return this.sidePanelProvider;
+    }
+
+    /**
+     * Attempt to create a solution file in the current workspace folder.
+     * 
+     * @return {Promise<void>}
+     */
+    async createSolutionFile() {
+
+        if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
+            vscode.window.showErrorMessage('No workspace is open');
+            return;
+        }
+
+        // per language configuration can be done here
+        const workspacePath = vscode.workspace.workspaceFolders[0].uri.fsPath;
+        const solutionPath = path.join(workspacePath, `${this.solutionFile}.js`);
+        const content = '// Your solution code here\n';
+
+        try {
+            await fs.promises.writeFile(solutionPath, content);
+            vscode.window.showInformationMessage('Solution file created');
+        } catch (error) {
+            vscode.window.showErrorMessage(`Error creating solution file: ${error.message}`);
+        }
+    }
+
+    /**
+     * Tells the vscode panel to update the content in the solution runner.
+     * 
+     * @param {import("@leetnotion/leetcode-api").Problem} problem Problem data queried from Leetcode
+     */
+    sendPanelData(problem) {
+        this.panelDataProvider.updateContents(problem);
     }
 }
