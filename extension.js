@@ -16,15 +16,32 @@ import { ProblemDescriptionProvider } from "./src/problem-description/ProblemDes
  * @param {vscode.ExtensionContext} context
  */
 export function activate(context) {
-  console.log("extension active");
+  	console.log("extension active");
 
-  const extRunner = new Engine(context.extensionUri, "solution");
+  	const extRunner = new Engine(context.extensionUri, "solution");
 
-  vscode.commands.registerCommand("leet.import-problem", extRunner.importProblem.bind(extRunner));
+	vscode.commands.registerCommand(
+		'leet.import-problem',
+		(pdata) => extRunner.importProblem(pdata)
+	);
 
-  vscode.window.registerTreeDataProvider("leet-browse-view", extRunner.getSidePanelProvider());
+	vscode.commands.registerCommand(
+		'leet.select-language',
+		(lang) => extRunner.selectLanguage(lang)
+	);
 
-  vscode.window.registerWebviewViewProvider("leet-run-view", extRunner.getPanelProvider());
+	vscode.commands.registerCommand(
+		'leet.page-up',
+		() => extRunner.pageProblems(true)
+	);
+
+	vscode.commands.registerCommand(
+		'leet.page-down',
+		() => extRunner.pageProblems(false)
+	);
+
+  	vscode.window.registerTreeDataProvider("leet-browse-view", extRunner.getSidePanelProvider());
+  	vscode.window.registerWebviewViewProvider("leet-run-view", extRunner.getPanelProvider());
 }
 
 export function deactivate() {}

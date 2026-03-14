@@ -15,99 +15,106 @@ const fileNameLength = 20;
  * State manager for the extension. Determines if user is logged in and can access features like submitting runnable solutions
  */
 export class Engine {
-  /** @type {LeetCode} */
-  apiEntry;
 
-  /** @type {boolean} Set to true if there are valid credentials for authenticated access. */
-  authenticated;
+	/** @type {LeetCode} */
+	apiEntry;
 
-  /** @type {vscode.TreeDataProvider} */
-  sidePanelProvider;
+	/** @type {boolean} Set to true if there are valid credentials for authenticated access. */
+	authenticated;
 
-  /** @type {string} Base name of solution source code file. */
-  solutionFile;
+	/** @type {LeetProblemProvider} */
+	sidePanelProvider;
 
-  /** @type {import("@leetnotion/leetcode-api").Problem} Queried data for the current problem. */
-  problemData;
+	/** @type {string} Base name of solution source code file. */
+	solutionFile;
 
-  /** @type {ProblemDescriptionProvider} Data provider for the bottom panel view. */
-  panelDataProvider;
+	/** @type {import("@leetnotion/leetcode-api").Problem} Queried data for the current problem. */
+	problemData;
 
-  /**
-   *
-   * Construct an engine with optional sign-in credentials
-   *
-   * @param {vscode.Uri} extensionRootUri Root path of the extension.
-   * @param {string} solutionfilename Name of the solution file to look for.
-   * @param {string} [session] Optional LeetCode session id.
-   * @param {string} [csrf] Optional LeetCode csrf token.
-   */
-  constructor(extensionRootUri, solutionfilename, session, csrf) {
-    this.authenticated = false;
-    this.solutionFile = solutionfilename;
+	/** @type {ProblemDescriptionProvider} Data provider for the bottom panel view. */
+	panelDataProvider;
 
-    if (session && csrf) {
-      const cred = new Credential({ csrf: csrf, session: session });
-      this.apiEntry = new LeetCode(cred);
-      this.apiEntry.whoami().then((wai) => (this.authenticated = wai.isSignedIn));
-    } else {
-      this.apiEntry = new LeetCode();
-    }
+	/** @type {string} Current language being worked in. */
+	currentLanguage;
+  
 
-    this.sidePanelProvider = new LeetProblemProvider(this.apiEntry);
-    this.panelDataProvider = new ProblemDescriptionProvider(extensionRootUri);
-  }
+	/**
+	 *
+	 * Construct an engine with optional sign-in credentials
+	 *
+	 * @param {vscode.Uri} extensionRootUri Root path of the extension.
+	 * @param {string} solutionfilename Name of the solution file to look for.
+	 * @param {string} [session] Optional LeetCode session id.
+	 * @param {string} [csrf] Optional LeetCode csrf token.
+	 */
+	constructor(extensionRootUri, solutionfilename, session, csrf) {
+		this.authenticated = false;
+		this.solutionFile = solutionfilename;
+		this.language = "JavaScript";
 
-  /**
-   * Command handler for importing problems
-   *
-   * @param {LeetHeading} heading
-   */
-  importProblem(heading) {
-    const slug = heading.getSlug();
-    console.log("import commanded for", slug);
+		if (session && csrf) {
+			const cred = new Credential({ csrf: csrf, session: session });
+			this.apiEntry = new LeetCode(cred);
+			this.apiEntry.whoami().then((wai) => (this.authenticated = wai.isSignedIn));
+		} else {
+			this.apiEntry = new LeetCode();
+		}
 
-    this.apiEntry
-      .problem(slug)
-      .then((p) => (this.problemData = p))
-      .catch((err) =>
-        vscode.window.showErrorMessage(
-          `Error while loading '${heading.problemData.title}': ${err}`,
-        ),
-      )
-      .then(this.createSolutionFile.bind(this));
-  }
+		this.sidePanelProvider = new LeetProblemProvider(this.apiEntry);
+		this.panelDataProvider = new ProblemDescriptionProvider(extensionRootUri);
+	}
 
-  /**
-   * Getter for side panel data provider.
-   */
-  getSidePanelProvider() {
-    return this.sidePanelProvider;
-  }
 
-  /**
-   * Attempt to create a solution file in the current workspace folder.
-   *
-   * @return {Promise<void>}
-   */
-  async createSolutionFile() {
-    if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
-      vscode.window.showErrorMessage("No workspace is open");
-      return;
-    }
+	/**
+	 * Command handler for importing problems
+	 *
+	 * @param {LeetHeading} heading
+	 */
+	importProblem(heading) {
+		const slug = heading.getSlug();
+		console.log("import commanded for", slug);
+
+		this.apiEntry
+			.problem(slug)
+			.then((p) => (this.problemData = p))
+			.catch((err) =>
+				vscode.window.showErrorMessage(
+				`Error while loading '${heading.problemData.title}': ${err}`,
+				),
+			)
+			.then(this.createSolutionFile.bind(this));
+	}
+
+	/**
+	 * Getter for side panel data provider.
+	 */
+	getSidePanelProvider() {
+		return this.sidePanelProvider;
+	}
+
+	/**
+	 * Attempt to create a solution file in the current workspace folder.
+	 *
+	 * @return {Promise<void>}
+	 */
+	async createSolutionFile() {
+		if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
+			vscode.window.showErrorMessage("No workspace is open");
+			return;
+		}
 
     // per language configuration can be done here
     const workspacePath = vscode.workspace.workspaceFolders[0].uri.fsPath;
     const problemPath = path.join(workspacePath, clampFileName(this.problemData));
 
     try {
-      if (!fs.existsSync(problemPath)) {
-        fs.mkdirSync(problemPath);
-      }
+      	if (!fs.existsSync(problemPath)) {
+        	fs.mkdirSync(problemPath);
+      	}
     } catch (error) {
-      vscode.window.showErrorMessage(
-        `Error creating ${clampFileName(this.problemData)} folder: ${error.message},`,
-      );
+      	vscode.window.showErrorMessage(
+        	`Error creating ${clampFileName(this.problemData)} folder: ${error.message},`,
+      	);
     }
     const solutionPath = path.join(problemPath, "solution.js");
     const selectedLanguage = this.problemData.codeSnippets.filter((cs) => cs.lang == "JavaScript");
@@ -115,32 +122,56 @@ export class Engine {
 
     //create solution file
     try {
-      if (!fs.existsSync(solutionPath)) {
-        await fs.promises.writeFile(solutionPath, content);
-      }
-      vscode.window.showInformationMessage("Solution file created");
+		if (!fs.existsSync(solutionPath)) {
+        	await fs.promises.writeFile(solutionPath, content);
+		}
+		vscode.window.showInformationMessage("Solution file created");
     } catch (error) {
-      vscode.window.showErrorMessage(`Error creating solution file: ${error.message}`);
+		vscode.window.showErrorMessage(`Error creating solution file: ${error.message}`);
     }
 
     //update panel data
     this.sendPanelData(this.problemData);
   }
 
-  getPanelProvider() {
-    return this.panelDataProvider;
-  }
+	getPanelProvider() {
+		return this.panelDataProvider;
+	}
 
-  /**
-   * Tells the vscode panel to update the content in the solution runner.
-   *
-   * @param {import("@leetnotion/leetcode-api").Problem} problem Problem data queried from Leetcode
-   */
-  sendPanelData(problem) {
-    this.panelDataProvider.updateContents(problem);
-  }
+	/**
+	 * Set the environment language
+	 * 
+	 * @param {string} language Expect proper name here
+	 */
+	selectLanguage(language) {
+
+		this.currentLanguage = language;
+	}
+
+	/**
+	 * Tells the vscode panel to update the content in the solution runner.
+	 *
+	 * @param {import("@leetnotion/leetcode-api").Problem} problem Problem data queried from Leetcode
+	 */
+	sendPanelData(problem) {
+		this.panelDataProvider.updateContents(problem);
+	}
+
+	/**
+	 * 
+	 * @param {boolean} pageup Set true to get next batch of problems, false to get previous batch
+	 */
+	pageProblems(pageup) {
+		
+		const side = this.sidePanelProvider;
+
+		if (pageup)
+			side.prevProblemBatch();
+		else
+			side.nextProblemBatch();
+	}
 }
 
 function clampFileName(problem) {
-  return problem.title.slice(0, fileNameLength).replaceAll(" ", "") + problem.questionFrontendId;
+	return problem.title.slice(0, fileNameLength).replace(" ", "") + problem.questionFrontendId;
 }
