@@ -222,7 +222,7 @@ export class LeetColoredText extends LeetItem {
      */
     constructor(text, color) {
         super(text, vscode.TreeItemCollapsibleState.None);
-        this.iconPath = "$(blank)";
+        this.iconPath = new vscode.ThemeIcon('blank');
        
         if (color)
             this.color = color;
