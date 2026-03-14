@@ -113,7 +113,6 @@ export class LeetHeading extends LeetItem {
         this.problemData = data;;
 
         this.contextValue = "importable";
-
         
 
         const percentFormat = /\d{1,2}.\d\d/;
@@ -152,6 +151,7 @@ export class LeetColoredText extends LeetItem {
      */
     constructor(text, color) {
         super(text, vscode.TreeItemCollapsibleState.None);
+        this.iconPath = "$(blank)";
        
         if (color)
             this.color = color;

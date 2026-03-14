@@ -25,7 +25,7 @@ export function activate(context) {
 	console.log('extension active');
 
 	const extRunner = new Engine(context.extensionUri, "solution");
-	
+
     context.subscriptions.push(
         vscode.window.registerFileDecorationProvider(new DifficultyDecorationProvider())
     );
