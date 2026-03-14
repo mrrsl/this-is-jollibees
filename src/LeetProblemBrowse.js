@@ -3,11 +3,8 @@ import {
     LeetCode
 } from '@leetnotion/leetcode-api';
 
-const sampleProblemQueryFilters = {
-    filters: {
-    },
-    limit: 20
-};
+
+const batchSize = 100;
 
 /**
  * Provider for the problem list view
@@ -22,17 +19,39 @@ export class LeetProblemProvider {
     /** @type {LeetCode} */
     lcQuery;
 
+    /** @type {number} Number for paging problem queries. */
+    problemListOffset;
+
+    /** @type {vscode.EventEmitter} */
+    changeEmitter;
+
+    /** @type {vscode.Event} */
+    onDidChangeTreeData;
+
+    /** @type {number} Number of problems published to date. */
+    maxCount;
+
     /**
      * API object for querying Leetcode.
      * 
      * @param {LeetCode} api 
      */
     constructor(api) {
+
         this.visibleProblemList = [];
         this.lcQuery = api;
+        this.problemListOffset = 0;
+        this.changeEmitter = new vscode.EventEmitter();
+        this.onDidChangeTreeData = this.changeEmitter.event;
+
+        this.getProblems(this.problemListOffset).then(
+
+        );
     }
 
     /**
+     * Required function.
+     *
      * @param {LeetItem} element 
      * 
      * @returns {vscode.TreeItem}
@@ -42,6 +61,7 @@ export class LeetProblemProvider {
     }
 
     /**
+     * Required function.
      * 
      * @param {LeetItem | null} element 
      * 
@@ -50,26 +70,73 @@ export class LeetProblemProvider {
     getChildren(element) {
 
         if (!element) {
-            return this.lcQuery.problems(sampleProblemQueryFilters).then(this.processProblemList.bind(this));
+            return Promise.resolve(this.visibleProblemList);
         }
 
         return Promise.resolve(element.children);
     }
 
     /**
-     * Process problem data for the displayed list.
+     * Appends to the visible problem list.
      * 
      * @param {import("@leetnotion/leetcode-api").ProblemList} pList Problem list returned by the `problems` function.
-     * 
-     * @return {Thenable<vscode.TreeItem[]>} Array of generated tree items.
      */
     processProblemList(pList) {
+        
+        const additions = pList.questions.map(p => new LeetHeading(p.questionFrontendId, p.title, p));
 
-        this.visibleProblemList = pList.questions.map(prob =>
-            new LeetHeading(prob.questionFrontendId, prob.title, prob)
-        );
+        this.visibleProblemList = additions;
 
         return Promise.resolve(this.visibleProblemList);
+    }
+
+    /**
+     * Progressively retrieve the entire Leetcodep problem set.
+     * 
+     * @param {number} [offset]
+     * 
+     * @returns {Promise<LeetItem[]>}
+     */
+    async getProblems(offset) {
+
+        this.problemListOffset = (offset) ? offset : 0;
+        const filter = {
+            offset: this.problemListOffset
+        }
+        let plist = await this.lcQuery.problems(filter);
+        this.processProblemList(plist);
+        this.maxCount = plist.total;
+
+        // notify consumers that the tree data changed (root refreshed)
+        this.changeEmitter.fire(null);
+
+        return this.visibleProblemList;
+    }
+
+    /**
+     * Get the next batch of problems to display.
+     */
+    nextProblemBatch() {
+        
+        const nextOffset = this.problemListOffset + batchSize;
+
+        if (nextOffset >= this.maxCount)
+            return
+
+        return this.getProblems(nextOffset);
+    }
+
+    /**
+     * Get the previous batch of problems to display.
+     */
+    prevProblemBatch() {
+
+        let prevOffset = this.problemListOffset - batchSize;
+
+        if (prevOffset < 0)
+            prevOffset = 0;
+
+        return this.getProblems(prevOffset)
     }
 }
 
