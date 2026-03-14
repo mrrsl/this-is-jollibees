@@ -3,10 +3,10 @@ import {
     LeetCode
 } from '@leetnotion/leetcode-api';
 
+// Set problem batch count here.
 const sampleProblemQueryFilters = {
     filters: {
     },
-    limit: 20
 };
 
 /**
@@ -22,6 +22,9 @@ export class LeetProblemProvider {
     /** @type {LeetCode} */
     lcQuery;
 
+    /** @type {number} Number for paging problem queries. */
+    problemListOffset;
+
     /**
      * API object for querying Leetcode.
      * 
@@ -30,6 +33,7 @@ export class LeetProblemProvider {
     constructor(api) {
         this.visibleProblemList = [];
         this.lcQuery = api;
+        this.problemListOffset = 0;
     }
 
     /**
