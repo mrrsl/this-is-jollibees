@@ -6,6 +6,10 @@
 import * as vscode from 'vscode';
 
 import {
+	Engine
+} from './src/Engine.js'
+
+import {
 	LeetProblemProvider
 } from './src/LeetProblemBrowse.js'
 
@@ -23,15 +27,16 @@ export function activate(context) {
 
 	console.log('extension active');
 
-	vscode.commands.registerCommand('leet.import-problem', (heading) => {
-		// Code for importing the detailed problem info
-		console.log("import commanded for", heading.problemData.titleSlug);
-	});
+	const extRunner = new Engine();
 
-	const treeProvider = new LeetProblemProvider();
+	vscode.commands.registerCommand(
+		'leet.import-problem',
+		extRunner.importProblem
+	);
+
 	vscode.window.registerTreeDataProvider(
         'leet-browse-view',
-        treeProvider
+        extRunner.getSidePanelProvider()
     );
 
 	const runnerProvider = new SolutionRunnerProvider(context.extensionUri);

@@ -92,7 +92,7 @@ export class LeetItem extends vscode.TreeItem {
     }
 }
 
-class LeetHeading extends LeetItem {
+export class LeetHeading extends LeetItem {
 
     /** @type {import("@leetnotion/leetcode-api").Problem}*/
     problemData
@@ -112,11 +112,7 @@ class LeetHeading extends LeetItem {
 
         this.contextValue = "importable";
 
-        this.command = {
-            command: "leet.import-problem",
-            title: "import",
-            arguments: [this.problemData.titleSlug]
-        }
+        
 
         const percentFormat = /\d{1,2}.\d\d/;
         
@@ -125,6 +121,17 @@ class LeetHeading extends LeetItem {
 
         this.children.push(new LeetColoredText(`Difficulty: ${data.difficulty}`, new vscode.ThemeColor("leet.lowacceptance")));
         this.children.push(new LeetColoredText(`Acceptance Rate: ${acRateFormatted}%`, new vscode.ThemeColor("leet.lowacceptance")));
+    }
+
+    /**
+     * Retrieve the slug used for the Leetcode problem URL.
+     */
+    getSlug() {
+        if (this.problemData == null)
+            return "";
+        else {
+            return this.problemData.titleSlug;
+        }
     }
 }
 
