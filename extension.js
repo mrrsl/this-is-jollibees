@@ -27,7 +27,7 @@ export function activate(context) {
 
     vscode.commands.registerCommand(
         "leet.create-test-cases",
-        () => extRunner.createTestCases(),
+        (p) => extRunner.generateTests(),
     );
 
     vscode.window.registerTreeDataProvider(

@@ -138,11 +138,30 @@ export class Engine {
 
 
 	/**
-	 * Generate test cases for the currently loaded problem using the language model.
+	 * @returns 
 	 */
-	async createTestCases() {
-		
+	async generateTests() {
+		const models = await vscode.lm.selectChatModels({
+			vendor: 'copilot',
+			family: 'gpt-4o'
+			});
+
+		const model = models[0];
+		if (!model) {
+			vscode.window.showErrorMessage('No Copilot model available, unable to generate test cases.')
+			return;
+		}
+
+		const messages = [
+			vscode.LanguageModelChatMessage.User('You are a software engineer trying to create test cases for a leetcode problem to test all general and edge cases.'),
+			vscode.LanguageModelChatMessage.User('This is the problem description, generate me test cases for the following problem: ' + this.problemData.content)
+		];
+
+		const response = await model.sendRequest(messages);
+
+		return response;
 	}
+    
 	/**
 	 * Set the environment language
 	 * 
@@ -174,34 +193,6 @@ export class Engine {
 			side.prevProblemBatch();
 		else
 			side.nextProblemBatch();
-	}
-	
-	/**
-	 * 
-	 * @param {string} problemDescription 
-	 * 
-	 * @returns 
-	 */
-	async generateTests(problemDescription) {
-		const models = await vscode.lm.selectChatModels({
-			vendor: 'copilot',
-			family: 'gpt-4o'
-			});
-
-		const model = models[0];
-		if (!model) {
-			vscode.window.showErrorMessage('No Copilot model available, unable to generate test cases.')
-			return;
-		}
-
-		const messages = [
-			vscode.LanguageModelChatMessage.User('You are a software engineer trying to create test cases for a leetcode problem to test all general and edge cases.'),
-			vscode.LanguageModelChatMessage.User('This is the problem description, generate me test cases for the following problem: ' + problemDescription)
-		];
-
-		const response = await model.sendRequest(messages);
-
-		return response;
 	}
 }
 
