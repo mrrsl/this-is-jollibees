@@ -124,6 +124,13 @@ export class Engine {
         	await fs.promises.writeFile(solutionPath, content);
 		}
 		vscode.window.showInformationMessage("Solution file created");
+
+		const fileUri = vscode.Uri.file(solutionPath);
+        const doc = await vscode.workspace.openTextDocument(fileUri);
+        await vscode.window.showTextDocument(doc, { 
+    	viewColumn: vscode.ViewColumn.Active,
+    	preview: false  // ✅ forces a permanent tab, not a preview tab
+		});
     } catch (error) {
 		vscode.window.showErrorMessage(`Error creating solution file: ${error.message}`);
     }

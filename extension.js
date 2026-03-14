@@ -7,7 +7,7 @@ import * as vscode from "vscode";
 
 import { Engine } from "./src/Engine.js";
 
-import { ProblemDescriptionProvider } from "./src/problem-description/ProblemDescription.js";
+import { DifficultyDecorationProvider } from "./src/LeetProblemBrowse.js";
 
 /**
  * This method is called when your extension is activated
@@ -19,6 +19,10 @@ export function activate(context) {
     console.log("extension active");
 
     const extRunner = new Engine(context.extensionUri, "solution");
+
+    vscode.window.registerFileDecorationProvider( 
+        new DifficultyDecorationProvider()
+    ),
 
     vscode.commands.registerCommand(
         "leet.import-problem",
