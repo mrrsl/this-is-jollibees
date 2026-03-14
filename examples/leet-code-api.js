@@ -7,7 +7,8 @@ const problemFilter = {
     filters: {
 
         // EASY | MEDIUM | HARD
-        difficulty: "EASY"
+        difficulty: "EASY",
+        tags: ["Dynamic Programming"]
     },
     limit: 10
 }
