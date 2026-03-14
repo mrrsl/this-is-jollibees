@@ -107,7 +107,6 @@ export class Engine {
             workspacePath,
             clampFileName(this.problemData),
         );
-
         try {
             if (!fs.existsSync(problemPath)) {
                 fs.mkdirSync(problemPath);
