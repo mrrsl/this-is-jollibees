@@ -5,7 +5,10 @@
 
 import * as vscode from "vscode";
 
-import { Engine } from "./src/Engine.js";
+import {
+	Engine
+} from './src/Engine.js'
+import { DifficultyDecorationProvider } from './src/LeetProblemBrowse.js'
 
 import { ProblemDescriptionProvider } from "./src/problem-description/ProblemDescription.js";
 
@@ -19,6 +22,10 @@ export function activate(context) {
   	console.log("extension active");
 
   	const extRunner = new Engine(context.extensionUri, "solution");
+
+    context.subscriptions.push(
+        vscode.window.registerFileDecorationProvider(new DifficultyDecorationProvider())
+    );
 
 	vscode.commands.registerCommand(
 		'leet.import-problem',
@@ -43,5 +50,6 @@ export function activate(context) {
   	vscode.window.registerTreeDataProvider("leet-browse-view", extRunner.getSidePanelProvider());
   	vscode.window.registerWebviewViewProvider("leet-run-view", extRunner.getPanelProvider());
 }
+
 
 export function deactivate() {}
