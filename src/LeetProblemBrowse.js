@@ -123,8 +123,8 @@ class LeetHeading extends LeetItem {
         let acRateFormatted = new String(data.acRate);
         acRateFormatted = acRateFormatted.match(percentFormat)[0];
 
-        this.children.push(new LeetColoredText(`Difficulty: ${data.difficulty}`));
-        this.children.push(new LeetColoredText(`Acceptance Rate: ${acRateFormatted}%`));
+        this.children.push(new LeetColoredText(`Difficulty: ${data.difficulty}`, new vscode.ThemeColor("leet.lowacceptance")));
+        this.children.push(new LeetColoredText(`Acceptance Rate: ${acRateFormatted}%`, new vscode.ThemeColor("leet.lowacceptance")));
     }
 }
 
@@ -137,8 +137,13 @@ export class LeetColoredText extends LeetItem {
     /**
      * 
      * @param {string} text Text to display
+     * @param {vscode.ThemeColor?} color
      */
-    constructor(text) {
+    constructor(text, color) {
         super(text, vscode.TreeItemCollapsibleState.None);
+       
+        if (color)
+            this.color = color;
+
     }
 }
