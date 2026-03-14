@@ -7,7 +7,7 @@ import path from "path";
 
 import { LeetProblemProvider, LeetHeading } from "./LeetProblemBrowse.js";
 
-import { SolutionRunnerProvider } from "./solution-runner/SolutionRunner.js";
+import { ProblemDescriptionProvider } from "./problem-description/ProblemDescription.js";
 
 const fileNameLength = 20;
 
@@ -31,7 +31,7 @@ export class Engine {
 	/** @type {import("@leetnotion/leetcode-api").Problem} Queried data for the current problem. */
 	problemData;
 
-	/** @type {SolutionRunnerProvider} Data provider for the bottom panel view. */
+	/** @type {ProblemDescriptionProvider} Data provider for the bottom panel view. */
 	panelDataProvider;
 
 	/** @type {string} Current language being worked in. */
@@ -61,9 +61,9 @@ export class Engine {
 		}
 
 		this.sidePanelProvider = new LeetProblemProvider(this.apiEntry);
-		this.panelDataProvider = new SolutionRunnerProvider(extensionRootUri);
+		this.panelDataProvider = new ProblemDescriptionProvider(extensionRootUri);
+	}
 
-  }
 
 	/**
 	 * Command handler for importing problems
@@ -103,19 +103,36 @@ export class Engine {
 			return;
 		}
 
-		// per language configuration can be done here
-		const workspacePath = vscode.workspace.workspaceFolders[0].uri.fsPath;
-		const solutionPath = path.join(workspacePath, `${clampFileName(this.problemData)}.js`);
-		const selectedLanguage = this.problemData.codeSnippets.filter((cs) => cs.lang == "JavaScript");
-		const content = selectedLanguage[0].code;
+    // per language configuration can be done here
+    const workspacePath = vscode.workspace.workspaceFolders[0].uri.fsPath;
+    const problemPath = path.join(workspacePath, clampFileName(this.problemData));
 
-		try {
-			await fs.promises.writeFile(solutionPath, content);
-			vscode.window.showInformationMessage("Solution file created");
-		} catch (error) {
-			vscode.window.showErrorMessage(`Error creating solution file: ${error.message}`);
+    try {
+      	if (!fs.existsSync(problemPath)) {
+        	fs.mkdirSync(problemPath);
+      	}
+    } catch (error) {
+      	vscode.window.showErrorMessage(
+        	`Error creating ${clampFileName(this.problemData)} folder: ${error.message},`,
+      	);
+    }
+    const solutionPath = path.join(problemPath, "solution.js");
+    const selectedLanguage = this.problemData.codeSnippets.filter((cs) => cs.lang == "JavaScript");
+    const content = selectedLanguage[0].code;
+
+    //create solution file
+    try {
+		if (!fs.existsSync(solutionPath)) {
+        	await fs.promises.writeFile(solutionPath, content);
 		}
-	}
+		vscode.window.showInformationMessage("Solution file created");
+    } catch (error) {
+		vscode.window.showErrorMessage(`Error creating solution file: ${error.message}`);
+    }
+
+    //update panel data
+    this.sendPanelData(this.problemData);
+  }
 
 	getPanelProvider() {
 		return this.panelDataProvider;

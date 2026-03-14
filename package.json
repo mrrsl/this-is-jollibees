@@ -14,7 +14,6 @@
     "onStartupFinished"
   ],
   "main": "./extension.js",
-
   "contributes": {
     "commands": [
       {
@@ -56,7 +55,7 @@
       "panel": [
         {
           "id": "leet-panel",
-          "title": "Test Solution",
+          "title": "Problem Description",
           "icon": "resources/icons/leet.svg"
         }
       ]
@@ -114,7 +113,6 @@
       }
     ]
   },
-
   "scripts": {
     "lint": "eslint .",
     "pretest": "npm run lint",
