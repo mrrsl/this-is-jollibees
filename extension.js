@@ -22,7 +22,12 @@ export function activate(context) {
 
     vscode.commands.registerCommand(
         "leet.import-problem",
-        extRunner.importProblem.bind(extRunner),
+		(p) => extRunner.importProblem(p)
+    );
+
+    vscode.commands.registerCommand(
+        "leet.create-test-cases",
+        () => extRunner.createTestCases(),
     );
 
     vscode.window.registerTreeDataProvider(

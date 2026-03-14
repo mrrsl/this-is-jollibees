@@ -34,6 +34,11 @@
         "icon": "$(desktop-download)"
       },
       {
+        "command": "leet.create-test-cases",
+        "title": "Create Test Cases",
+        "icon": "$(thinking)"
+      },
+      {
         "command": "leet.page-down",
         "title": "Down",
         "icon": "$(chevron-down)"
@@ -49,14 +54,14 @@
         {
           "id": "leet-sidebar",
           "title": "Browse Problems",
-          "icon": "resources/icons/leet.svg"
+          "icon": "resources/icons/leet.png"
         }
       ],
       "panel": [
         {
           "id": "leet-panel",
           "title": "Problem Description",
-          "icon": "resources/icons/leet.svg"
+          "icon": "resources/icons/leet.png"
         }
       ]
     },
@@ -65,7 +70,7 @@
         {
           "id": "leet-browse-view",
           "name": "All",
-          "icon": "resources/icons/leet.svg"
+          "icon": "resources/icons/leet.png"
         }
       ],
       "leet-panel": [
@@ -73,7 +78,7 @@
           "id": "leet-run-view",
           "name": "Run Solution",
           "type": "webview",
-          "icon": "resources/icons/leet.svg"
+          "icon": "resources/icons/leet.png"
         }
       ]
     },
@@ -99,6 +104,12 @@
           "when": "view == leet-browse-view",
           "group": "navigation",
           "arguments": [true]
+        }
+        ,
+        {
+          "command": "leet.create-test-cases",
+          "when": "view == leet-run-view",
+          "group": "navigation"
         }
       ]
     },
