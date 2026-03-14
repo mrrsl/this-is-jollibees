@@ -24,6 +24,11 @@
       {
         "command": "leet.run_solution",
         "title": "Run Leet Solution"
+      },
+      {
+        "command": "leet.import-problem",
+        "title": "Import this problem",
+        "icon": "$(desktop-download)"
       }
     ],
     "viewsContainers": {
@@ -58,6 +63,15 @@
         }
       ]
     },
+    "menus": {
+      "view/item/context": [
+        {
+          "command": "leet.import-problem",
+          "when": "viewItem == importable",
+          "group": "inline"
+        }
+      ]
+    },
     "colors": [
       {
         "id": "leet.lowacceptance",
@@ -69,6 +83,7 @@
       }
     ]
   },
+
   "scripts": {
     "lint": "eslint .",
     "pretest": "npm run lint",
@@ -83,6 +98,7 @@
     "eslint": "^9.39.3"
   },
   "dependencies": {
-    "@leetnotion/leetcode-api": "^1.10.0"
+    "@leetnotion/leetcode-api": "^1.10.0",
+    "@vscode/codicons": "^0.0.45"
   }
 }
