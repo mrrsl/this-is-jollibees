@@ -7,7 +7,7 @@ import path from "path";
 
 import { LeetProblemProvider, LeetHeading } from "./LeetProblemBrowse.js";
 
-import { SolutionRunnerProvider } from "./solution-runner/SolutionRunner.js";
+import { ProblemDescriptionProvider } from "./problem-description/ProblemDescription.js";
 
 const fileNameLength = 20;
 
@@ -30,7 +30,7 @@ export class Engine {
   /** @type {import("@leetnotion/leetcode-api").Problem} Queried data for the current problem. */
   problemData;
 
-  /** @type {SolutionRunnerProvider} Data provider for the bottom panel view. */
+  /** @type {ProblemDescriptionProvider} Data provider for the bottom panel view. */
   panelDataProvider;
 
   /**
@@ -55,7 +55,7 @@ export class Engine {
     }
 
     this.sidePanelProvider = new LeetProblemProvider(this.apiEntry);
-    this.panelDataProvider = new SolutionRunnerProvider(extensionRootUri);
+    this.panelDataProvider = new ProblemDescriptionProvider(extensionRootUri);
   }
 
   /**
@@ -113,6 +113,7 @@ export class Engine {
     const selectedLanguage = this.problemData.codeSnippets.filter((cs) => cs.lang == "JavaScript");
     const content = selectedLanguage[0].code;
 
+    //create solution file
     try {
       if (!fs.existsSync(solutionPath)) {
         await fs.promises.writeFile(solutionPath, content);
@@ -121,6 +122,9 @@ export class Engine {
     } catch (error) {
       vscode.window.showErrorMessage(`Error creating solution file: ${error.message}`);
     }
+
+    //update panel data
+    this.sendPanelData(this.problemData);
   }
 
   getPanelProvider() {
