@@ -22,7 +22,7 @@
         "title": "Browse Problems"
       },
       {
-        "command": "leet.run_solution",
+        "command": "leet.run-solution",
         "title": "Run Leet Solution"
       },
       {
@@ -59,6 +59,7 @@
         {
           "id": "leet-run-view",
           "name": "Run Solution",
+          "type": "webview",
           "icon": "resources/icons/leet.svg"
         }
       ]
