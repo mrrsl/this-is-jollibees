@@ -9,6 +9,8 @@ import { LeetProblemProvider, LeetHeading } from "./LeetProblemBrowse.js";
 
 import { SolutionRunnerProvider } from "./solution-runner/SolutionRunner.js";
 
+const fileNameLength = 20;
+
 /**
  * State manager for the extension. Determines if user is logged in and can access features like submitting runnable solutions
  */
@@ -96,7 +98,7 @@ export class Engine {
 
     // per language configuration can be done here
     const workspacePath = vscode.workspace.workspaceFolders[0].uri.fsPath;
-    const solutionPath = path.join(workspacePath, `${this.solutionFile}.js`);
+    const solutionPath = path.join(workspacePath, `${clampFileName(this.problemData)}.js`);
     const selectedLanguage = this.problemData.codeSnippets.filter((cs) => cs.lang == "JavaScript");
     const content = selectedLanguage[0].code;
 
@@ -120,4 +122,8 @@ export class Engine {
   sendPanelData(problem) {
     this.panelDataProvider.updateContents(problem);
   }
+}
+
+function clampFileName(problem) {
+  return problem.title.slice(0, fileNameLength).replace(" ", "") + problem.questionFrontendId;
 }
