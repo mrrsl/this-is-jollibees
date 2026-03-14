@@ -4,7 +4,6 @@ export default [{
     files: ["**/*.js"],
     languageOptions: {
         globals: {
-            ...globals.commonjs,
             ...globals.node,
             ...globals.mocha,
         },

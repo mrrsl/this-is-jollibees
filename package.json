@@ -11,8 +11,7 @@
     "Other"
   ],
   "activationEvents": [
-    "onStartupFinished",
-    "onView:leet-browse-view"
+    "onStartupFinished"
   ],
   "main": "./extension.js",
   "contributes": {
