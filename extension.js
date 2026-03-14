@@ -9,37 +9,33 @@ import {
 	LeetProblemProvider
 } from './src/LeetProblemBrowse.js'
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
+import {
+	SolutionRunnerProvider
+} from './src/solution-runner/SolutionRunner.js'
 
 /**
+ * This method is called when your extension is activated
+ * Your extension is activated the very first time the command is executed
+ * 
  * @param {vscode.ExtensionContext} context
  */
 export function activate(context) {
 
 	console.log('extension active');
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with  registerCommand
-	// The commandId parameter must match the command field in package.json
-	const disposable = vscode.commands.registerCommand('htb-lc.helloWorld', function () {
-		// The code you place here will be executed every time your command is executed
-		vscode.window.showInformationMessage('Hello World from htb-lc!');
-	});
-
-	vscode.commands.registerCommand('leet.import-problem', (heading)=>{
+	vscode.commands.registerCommand('leet.import-problem', (heading) => {
 		// Code for importing the detailed problem info
 		console.log("import commanded for", heading.problemData.titleSlug);
 	});
-	const treeProvider = new LeetProblemProvider();
 
+	const treeProvider = new LeetProblemProvider();
 	vscode.window.registerTreeDataProvider(
         'leet-browse-view',
         treeProvider
     );
 
-	context.subscriptions.push(disposable);
+	const runnerProvider = new SolutionRunnerProvider(context.extensionUri);
+	vscode.window.registerWebviewViewProvider("leet-run-view", runnerProvider);
 }
 
-// This method is called when your extension is deactivated
 export function deactivate() {}
