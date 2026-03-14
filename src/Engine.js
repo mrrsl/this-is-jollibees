@@ -117,6 +117,10 @@ export class Engine {
         }
     }
 
+    getPanelProvider() {
+        return this.panelDataProvider;
+    }
+
     /**
      * Tells the vscode panel to update the content in the solution runner.
      * 

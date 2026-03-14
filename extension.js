@@ -35,8 +35,7 @@ export function activate(context) {
         extRunner.getSidePanelProvider()
     );
 
-	const runnerProvider = new SolutionRunnerProvider(context.extensionUri);
-	vscode.window.registerWebviewViewProvider("leet-run-view", runnerProvider);
+	vscode.window.registerWebviewViewProvider("leet-run-view", extRunner.getPanelProvider());
 }
 
 export function deactivate() {}
