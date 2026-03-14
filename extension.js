@@ -27,8 +27,9 @@ export function activate(context) {
 		vscode.window.showInformationMessage('Hello World from htb-lc!');
 	});
 
-	vscode.commands.registerCommand('leet.import-problem', (problemSlug)=>{
+	vscode.commands.registerCommand('leet.import-problem', (heading)=>{
 		// Code for importing the detailed problem info
+		console.log("import commanded for", heading.problemData.titleSlug);
 	});
 	const treeProvider = new LeetProblemProvider();
 

@@ -102,13 +102,21 @@ class LeetHeading extends LeetItem {
      * 
      * @param {string | number} num 
      * @param {string} title 
-     * @param {any} data 
+     * @param {any} data Individual element from the {@link ProblemList} `questions` array
      */
     constructor(num, title, data) {
         super(`${num}. ${title}`, vscode.TreeItemCollapsibleState.Collapsed);
 
         this.children = [];
-        this.problemData = data;
+        this.problemData = data;;
+
+        this.contextValue = "importable";
+
+        this.command = {
+            command: "leet.import-problem",
+            title: "import",
+            arguments: [this.problemData.titleSlug]
+        }
 
         const percentFormat = /\d{1,2}.\d\d/;
         
@@ -117,7 +125,6 @@ class LeetHeading extends LeetItem {
 
         this.children.push(new LeetColoredText(`Difficulty: ${data.difficulty}`));
         this.children.push(new LeetColoredText(`Acceptance Rate: ${acRateFormatted}%`));
-        this.children.push(new LeetImportButton(data.questionFrontendId));
     }
 }
 
@@ -133,22 +140,5 @@ export class LeetColoredText extends LeetItem {
      */
     constructor(text) {
         super(text, vscode.TreeItemCollapsibleState.None);
-    }
-}
-
-/**
- * Import button to set up the local dev environment
- */
-export class LeetImportButton extends LeetItem {
-
-    problemNumber;
-
-    /**
-     * 
-     */
-    constructor(problemNumber) {
-        super("Import", vscode.TreeItemCollapsibleState.None);
-
-        this.problemNumber = problemNumber;
     }
 }
