@@ -37,13 +37,15 @@
   </body>
   <script>
     const titleRef = document.getElementById("title");
+    const descripRef = document.getElementById("description");
     /*
     List of potential objects that may be passed through the message event
     - Problem from @leetnotion/leetcode-api
     */
     window.addEventListener("message", (event) => {
       const data = event.data;
-      titleRef.innerHTML = `<code>${data.title}</code><br/><code>${data.content}</code>`;
+      titleRef.innerHTML = `<code>${data.title}</code>`;
+      descripRef.innerHTML = `<code>${data.content}</code>`;
     });
   </script>
 </html>
