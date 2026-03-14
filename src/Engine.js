@@ -80,7 +80,10 @@ export class Engine {
         console.log("import commanded for", slug);
 
         this.apiEntry.problem(slug)
-            .then(p => this.problemData = p)
+            .then(p => {
+                this.problemData = p;
+                this.sendPanelData(this.problemData);
+            })
             .catch(err => vscode.window.showErrorMessage(`Error while loading '${heading.problemData.title}': ${err}`))
             .then(this.createSolutionFile.bind(this));
     }

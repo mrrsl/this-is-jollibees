@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Solution Runner</title>
     <style>
         body {
@@ -21,12 +22,27 @@
         .container {
             max-width: 100%;
         }
+
+        code {
+            font-family: monospace;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Solution Runner</h1>
+        <h2 id="title">Solution Runner</h2>
         <p>This is where your solution will be tested.</p>
     </div>
 </body>
+<script>
+    const titleRef = document.getElementById("title");
+    /*
+    List of potential objects that may be passed through the message event
+    - Problem from @leetnotion/leetcode-api
+    */
+    window.addEventListener('message', event => {
+        const data = event.data;
+        titleRef.innerHTML = `Test cases for <code>${data.title}</code>`;
+    });
+</script>
 </html>
