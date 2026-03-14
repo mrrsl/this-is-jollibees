@@ -1,7 +1,7 @@
 {
-  "name": "htb-lc",
-  "displayName": "Leet Code Importer",
-  "description": "leetcode problem exporter",
+  "name": "plylf",
+  "displayName": "PLYLF",
+  "description": "leetcode problem exporter AKA Practice Leetcode You Lazy Freak",
   "version": "0.0.1",
   "type": "module",
   "engines": {
@@ -14,6 +14,7 @@
     "onStartupFinished"
   ],
   "main": "./extension.js",
+
   "contributes": {
     "commands": [
       {
@@ -56,7 +57,17 @@
           "icon": "resources/icons/leet.svg"
         }
       ]
-    }
+    },
+    "colors": [
+      {
+        "id": "leet.lowacceptance",
+        "description": "text color for low acceptance rate",
+        "defaults": {
+          "light": "#C22402",
+          "dark": "#D93B18"
+        }
+      }
+    ]
   },
   "scripts": {
     "lint": "eslint .",
