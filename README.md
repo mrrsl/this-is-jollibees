@@ -1,6 +1,7 @@
 ## Feature Priority
-1) Question list fetch
-2) Local file generation
+1) ~~Question list fetch~~
+2) ~~Test runner panel setup~~
+3) Local file generation
     * Non-empty directory warning
     * Problem README
     * Problem source code generation
