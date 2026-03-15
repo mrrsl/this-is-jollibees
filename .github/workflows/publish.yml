@@ -31,15 +31,6 @@ jobs:
         run: |
           npm run setup
 
-      - name: Substitue for actual API keys
-        run: |
-          sed -E "s/\\{\s*?apiKey\s*?:.+?\}/{apiKey:${{ secrets.GEMINI_KEY }}}/" src/Engine.js > src/Engine.js
-          grep -E "\{apiKey:.+?\}" src/Engine.js
-          if [ $? -ne 0 ]
-            echo "Key substitution failed"
-            exit 1
-          fi
-
       - name: Publish extension
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
