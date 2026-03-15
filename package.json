@@ -3,20 +3,17 @@
   "name": "plylf",
   "displayName": "PLYLF",
   "description": "leetcode problem exporter AKA Practice Leetcode You Lazy Freak",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "type": "module",
   "engines": {
     "vscode": "^1.100.0"
   },
-  "icons": "resources/icons/lcpaint.png",
+  "icon": "resources/icons/lcpaint.png",
   "categories": [
     "Other"
   ],
   "activationEvents": [
     "onStartupFinished"
-  ],
-  "extensionDependencies": [
-    "GitHub.copilot-chat"
   ],
   "main": "./extension.js",
   "contributes": {
@@ -69,7 +66,7 @@
         "icon": "$(star-empty)"
       },
       {
-        "command": "leet.toggle-sort",       
+        "command": "leet.toggle-sort",
         "title": "Toggle Sort Order",
         "icon": "$(arrow-swap)"
       }
@@ -114,15 +111,14 @@
           "when": "viewItem == importable",
           "group": "inline"
         }
-      ]
-      ,
+      ],
       "view/title": [
         {
           "command": "leet.create-test-cases",
           "when": "view == leet-run-view",
           "group": "navigation"
         },
-             {
+        {
           "command": "leet.toggle-sort",
           "when": "view == leet-browse-view",
           "group": "navigation@1"
@@ -170,6 +166,7 @@
     "eslint": "^9.39.3"
   },
   "dependencies": {
+    "@google/genai": "^1.45.0",
     "@leetnotion/leetcode-api": "^1.10.0",
     "@vscode/codicons": "^0.0.45"
   }
