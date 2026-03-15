@@ -26,6 +26,10 @@ jobs:
         run: |
           npm install
           npm ci
+      
+      - name: Run setup
+        run: |
+          npm run setup
 
       - name: Publish extension
         env:
