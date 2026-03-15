@@ -8,6 +8,7 @@
   "engines": {
     "vscode": "^1.100.0"
   },
+  "icons": "resources/icons/lcpaint.png",
   "categories": [
     "Other"
   ],
