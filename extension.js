@@ -19,8 +19,8 @@ export function activate(context) {
     console.log("extension active");
 
     const extRunner = new Engine(context.extensionUri, "solution");
-
 	const tabChange = vscode.window.onDidChangeActiveTextEditor(editor => extRunner.tabChangeHandler(editor));
+
     vscode.window.registerFileDecorationProvider( 
         new DifficultyDecorationProvider()
     ),
