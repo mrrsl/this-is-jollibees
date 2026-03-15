@@ -31,9 +31,9 @@ jobs:
         run: |
           npm run setup
 
-      - name: Substitute script variables with API keys
+      - name: Substitue for actual API keys
         run: |
-          echo "const GEMINI_KEY = '${{ secrets.GEMINI_KEY }}'" >> src/Gemini.js
+          sed -E "s/\\{\s*?apiKey\s*?:.+?\}/{apiKey: ${{ secret.GEMINI_KEY }}}" > src/Engine.js
           cat src/Gemini.js | grep "-E "const GEMINI_KEY = [^\n]+" > /dev/null
           if [ $? -ne 0 ]
             echo "Key substitution failed"
