@@ -273,6 +273,10 @@ export class Engine {
 	 * @param {vscode.TextEditor} editor 
 	 */
 	async tabChangeHandler(editor) {
+		
+		if (editor == null)
+			return;
+		
 		const filename = editor.document.uri.fsPath;
 		const directoryname = path.dirname(filename);
 

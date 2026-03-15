@@ -222,7 +222,6 @@ export class LeetHeading extends LeetItem {
     /** @type {import("@leetnotion/leetcode-api").Problem}*/
     problemData
 
-
     /**
      * @param {any} data Individual element from the {@link ProblemList} `questions` array
      */
@@ -230,7 +229,8 @@ export class LeetHeading extends LeetItem {
         super(`${data.questionFrontendId}. ${data.title}`, vscode.TreeItemCollapsibleState.Collapsed);
 
         this.children = [];
-        this.problemData = data;;
+        this.problemData = data;
+        this.tooltip = (data.topicTags[0]) ? data.topicTags[0].name : null;
 
         this.contextValue = "importable";
 
