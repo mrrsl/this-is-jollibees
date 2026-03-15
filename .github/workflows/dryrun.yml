@@ -27,6 +27,9 @@ jobs:
           npm install
           npm ci
       
+      - name: Substitue for actual API keys
+        run: |
+          sed -E 's/\{\s*?apiKey\s*?:.+?\}/{apiKey: "${{ secrets.GEMINI_KEY }}"}/' src/Engine.js > src/Engine.js
 
       - name: Substitue for actual API keys
         run: |
