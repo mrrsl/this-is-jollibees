@@ -20,7 +20,7 @@ export function activate(context) {
 
     const extRunner = new Engine(context.extensionUri, "solution");
 	const tabChange = vscode.window.onDidChangeActiveTextEditor(editor => extRunner.tabChangeHandler(editor));
-4
+
     vscode.window.registerFileDecorationProvider( 
         new DifficultyDecorationProvider()
     ),
@@ -42,7 +42,10 @@ export function activate(context) {
 
     vscode.commands.registerCommand(
         "leet.create-test-cases",
-        (p) => extRunner.generateTests(),
+        async () => {
+        const problemPath = await extRunner.createProblemFolder();
+        if (problemPath) await extRunner.createTestsFile(problemPath);
+    }
     );
 
     vscode.window.registerTreeDataProvider(
