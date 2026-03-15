@@ -122,7 +122,12 @@ export class LeetProblemProvider {
             const batchHeadings = batch.questions.map(p => new LeetHeading(p));
             this.cachedProblems = [...this.cachedProblems, ...batchHeadings];
 
-            this.setVisibleProblemList(this.cachedProblems);
+            if (this.currentFilter.filters.difficulty) {
+                const workingList = this.cachedProblems.filter(q => q.problemData.difficulty.toUpperCase() == this.currentFilter.filters.difficulty);
+                this.setVisibleProblemList(workingList);
+            }
+            else
+                this.showAll();
         }
     }
 
