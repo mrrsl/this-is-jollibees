@@ -44,7 +44,7 @@ export class ProblemDescriptionProvider {
 
     this.generateHtml(viewarg.webview);
 
-    // checks for messages from the webview, and if its a setLanguage command, set the current language to the new language
+    // checks for messages from the webview, and if its a setLanguage command, calls onLanguageChange with the new language so the extension knows
     this.view.webview.onDidReceiveMessage((message) => {
       if (message.command === "setLanguage") {
         this.onLanguageChange?.(message.language);

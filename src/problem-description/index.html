@@ -36,6 +36,7 @@
     </div>
   </body>
   <script>
+  // can't import it from languages.js because this is as script tag in html so I'm defining it here
   const languages = {
     "C++": "cpp", "Java": "java", "Python3": "py", "Python": "py",
     "JavaScript": "js", "TypeScript": "ts", "C#": "cs", "C": "c",
@@ -51,10 +52,13 @@
 
   // creates all the options for languages in the dropdown menu
   const dropdown = document.getElementById("laguage-selection");
+
   for (const language in languages) {
     const option = document.createElement("option");
+
     option.value = language;
     option.text = language;
+
     // makes javascript the default language
     if (language === "JavaScript") {
       option.selected = true;
@@ -64,12 +68,14 @@
 
   dropdown.addEventListener("change", (event) => {
     const selectedLanguage = event.target.value;
+
+    //sends this to ProblemDescription.js
     vscode.postMessage({ command: "setLanguage", language: selectedLanguage });
   });
 
   window.addEventListener("message", (event) => {
     const { problem, currentLanguage } = event.data;
-     console.log("received message:", { problem, currentLanguage });
+
     titleRef.innerHTML = `<code>${problem.title}</code>`;
     descripRef.innerHTML = `<code>${problem.content}</code>`;
 

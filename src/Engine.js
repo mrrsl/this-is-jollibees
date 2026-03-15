@@ -147,8 +147,6 @@ export class Engine {
 			vscode.window.showErrorMessage("No workspace is open");
 			return;
 		}
-
-    		// per language configuration can be done here
     		const workspacePath = vscode.workspace.workspaceFolders[0].uri.fsPath;
     		const problemPath = path.join(workspacePath, clampFileName(this.problemData));
 
@@ -171,9 +169,11 @@ export class Engine {
 	 * @param {string} problemPath the path to the problem folder of that specific question, where the solution file should be created.
 	 */
 	async createSolutionFile(problemPath) {
+		// all this just gets the correct file extension and assigns it to the solution file to be created as the current language
 		const langConfig = languages[this.currentLanguage];
 		const fileType = typeof langConfig === 'object' ? langConfig.extension : "js";
 		const solutionPath = path.join(problemPath, `solution.${fileType}`);
+
         const selectedLanguage = this.problemData.codeSnippets.filter((cs) => cs.lang == this.currentLanguage);
         const content = selectedLanguage[0].code;
 
@@ -203,9 +203,11 @@ export class Engine {
 	 * @param {string} problemPath the path to the problem folder of that specific question, where the tests file should be created.
 	 */
 	async createTestsFile(problemPath) {
+		// this is repeated from createSolutionFile, getting the correct file extension to create the test files with
 		const langConfig = languages[this.currentLanguage];
 		const fileType = typeof langConfig === 'object' ? langConfig.extension : "js";
 		const testCasesPath = path.join(problemPath, `tests.${fileType}`);
+
 		try {
 			const testContent = (await this.generateTests()) || "//LLM failed to respond.";
 			if (!fs.existsSync(testCasesPath)) {
@@ -305,6 +307,13 @@ export class Engine {
 	}
 }
 
+/**
+ * Formats the file to have no empty spaces and seperate the title and id with a dash.
+ * Ex. "Two Sum" becomes "TwoSum-1"
+ * 
+ * @param {import("@leetnotion/leetcode-api").Problem} problem 
+ * @returns the formatted problem title as a string
+ */
 function clampFileName(problem) {
 	return problem.title.replaceAll(" ", "") + ("-") + problem.questionFrontendId;
 }
