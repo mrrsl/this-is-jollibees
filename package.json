@@ -66,6 +66,11 @@
         "command": "leet.set-filter-easy",
         "title": "Easy",
         "icon": "$(star-empty)"
+      },
+      {
+        "command": "leet.toggle-sort",       
+        "title": "Toggle Sort Order",
+        "icon": "$(arrow-swap)"
       }
     ],
     "viewsContainers": {
@@ -116,20 +121,25 @@
           "when": "view == leet-run-view",
           "group": "navigation"
         },
+             {
+          "command": "leet.toggle-sort",
+          "when": "view == leet-browse-view",
+          "group": "navigation@1"
+        },
         {
           "command": "leet.set-filter-hard",
           "when": "view == leet-browse-view",
-          "group": "navigation@3"
+          "group": "navigation@4"
         },
         {
           "command": "leet.set-filter-med",
           "when": "view == leet-browse-view",
-          "group": "navigation@2"
+          "group": "navigation@3"
         },
         {
           "command": "leet.set-filter-easy",
           "when": "view == leet-browse-view",
-          "group": "navigation@1"
+          "group": "navigation@2"
         }
       ]
     },
