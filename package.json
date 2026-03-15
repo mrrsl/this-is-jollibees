@@ -1,4 +1,5 @@
 {
+  "publisher": "htb-fast-food-workers",
   "name": "plylf",
   "displayName": "PLYLF",
   "description": "leetcode problem exporter AKA Practice Leetcode You Lazy Freak",
