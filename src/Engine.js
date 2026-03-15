@@ -5,7 +5,7 @@ import * as vscode from "vscode";
 import fs from "fs";
 import path from "path";
 
-import { LeetProblemProvider, LeetHeading } from "./LeetProblemBrowse.js";
+import { LeetProblemProvider, LeetHeading, Difficulty } from "./LeetProblemBrowse.js";
 
 import { ProblemDescriptionProvider } from "./problem-description/ProblemDescription.js";
 
@@ -166,20 +166,6 @@ export class Engine {
 	sendPanelData(problem) {
 		this.panelDataProvider.updateContents(problem);
 	}
-
-	/**
-	 * 
-	 * @param {boolean} pageup Set true to get next batch of problems, false to get previous batch
-	 */
-	pageProblems(pageup) {
-		
-		const side = this.sidePanelProvider;
-
-		if (pageup)
-			side.prevProblemBatch();
-		else
-			side.nextProblemBatch();
-	}
 	
 	/**
 	 * 
@@ -221,6 +207,21 @@ export class Engine {
 		
 		this.problemData = await this.apiEntry.problem(updatedSlug);
 		this.sendPanelData(this.problemData);
+	}
+
+	/** Filter for only hard problems. */
+	filterHard() {
+		this.sidePanelProvider.filterByDifficulty("HARD");
+	}
+
+	/** Filter for only medium problems. */
+	filterMedium() {
+		this.sidePanelProvider.filterByDifficulty("MEDIUM");
+	}
+
+	/** Filter for only easy problems. */
+	filterEasy() {
+		this.sidePanelProvider.filterByDifficulty("EASY");
 	}
 }
 
