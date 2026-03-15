@@ -41,6 +41,8 @@ export function activate(context) {
         "leet-run-view",
         extRunner.getPanelProvider(),
     );
+	
+	context.subscriptions.push(tabChange);
 }
 
 export function deactivate() {}

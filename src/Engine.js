@@ -9,6 +9,8 @@ import { LeetProblemProvider, LeetHeading } from "./LeetProblemBrowse.js";
 
 import { ProblemDescriptionProvider } from "./problem-description/ProblemDescription.js";
 
+import { SlugMap } from "./SlugMap.js";
+
 /**
  * State manager for the extension. Determines if user is logged in and can access features like submitting runnable solutions
  */
@@ -208,8 +210,16 @@ export class Engine {
 	 * Handles tab change events so we know what we're working on
 	 * @param {vscode.TextEditor} editor 
 	 */
-	tabChangeHandler(editor) {
+	async tabChangeHandler(editor) {
+		const filename = editor.document.uri.fsPath;
+		const directoryname = path.dirname(filename);
+
+		const matches = directoryname.match(/\d+$/);
+		const index = parseInt(matches[0]);
+		const updatedSlug = SlugMap[index - 1];
 		
+		this.problemData = await this.apiEntry.problem(updatedSlug);
+		this.sendPanelData(this.problemData);
 	}
 }
 
