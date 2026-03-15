@@ -183,11 +183,9 @@ export class Engine {
 	
 	/**
 	 * 
-	 * @param {string} problemDescription 
-	 * 
 	 * @returns 
 	 */
-	async generateTests(problemDescription) {
+	async generateTests() {
 		const models = await vscode.lm.selectChatModels({
 			vendor: 'copilot',
 			family: 'gpt-4o'
@@ -201,7 +199,7 @@ export class Engine {
 
 		const messages = [
 			vscode.LanguageModelChatMessage.User('You are a software engineer trying to create test cases for a leetcode problem to test all general and edge cases.'),
-			vscode.LanguageModelChatMessage.User('This is the problem description, generate me test cases for the following problem: ' + problemDescription)
+			vscode.LanguageModelChatMessage.User('This is the problem description, generate me test cases for the following problem: ' + this.problemData.content)
 		];
 
 		const response = await model.sendRequest(messages);
