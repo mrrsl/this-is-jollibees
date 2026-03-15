@@ -2,7 +2,7 @@ name: Publish VS Code Extension
 
 on:
   push:
-    branches: [ release ]
+    branches: [ '**', '!release' ]
 
 jobs:
   publish:
@@ -39,14 +39,3 @@ jobs:
             echo "Key substitution failed"
             exit 1
           fi
-
-      - name: Publish extension
-        env:
-          VSCE_PAT: ${{ secrets.VSCE_PAT }}
-        run: |
-          if [ -z "${VSCE_PAT}" ]; then
-            echo "Required secret VSCE_PAT is not set" >&2
-            exit 1
-          fi
-          # Publish using the PAT. The repository's package.json should contain a valid "publisher" field.
-          npx vsce publish -p "${VSCE_PAT}"

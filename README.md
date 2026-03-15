@@ -1,3 +1,9 @@
+## Quickstart
+1) Open VS Code in a directory dedicated to your problems.
+2) Click the import button on any problem in the sidebar list
+3) Hit the thinking icon on the bottom 'Problem Description' panel to generate your test cases
+4) Click the clipboard icon to copy the contents of the current editor
+
 ## Feature Priority
 1) ~~Question list fetch~~
 2) ~~Test runner panel setup~~
