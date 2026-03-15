@@ -27,9 +27,18 @@ jobs:
           npm install
           npm ci
       
-      - name: Run setup
+      - name: Run setup (slug Map Generation)
         run: |
           npm run setup
+
+      - name: Substitute script variables with API keys
+        run: |
+          echo "const GEMINI_KEY = '${{ secrets.GEMINI_KEY }}'" >> src/Gemini.js
+          cat src/Gemini.js | grep "-E "const GEMINI_KEY = [^\n]+" > /dev/null
+          if [ $? -ne 0 ]
+            echo "Key substitution failed"
+            exit 1
+          fi
 
       - name: Publish extension
         env:
