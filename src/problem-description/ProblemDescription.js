@@ -3,7 +3,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 /**
- * Connector class to make src/solution-runner/index.html visible to the extension
+ * Connector class to make src/solution-runner/index.html visible to the extension.
  *
  * @implements {vscode.WebviewViewProvider}
  */
@@ -81,11 +81,12 @@ export class ProblemDescriptionProvider {
   }
 
   /**
-   * Sends data to the panel webview so it can update its contents for a different problem
+   * Sends data to the panel webview so it can update its contents for a different problem.
    *
-   * @param {import("@leetnotion/leetcode-api").Problem} problem
+   * @param {import("@leetnotion/leetcode-api").Problem} problem the problem data being sent
+   * @param {string} currentLanguage the current language of the problem
    */
-  updateContents(problem) {
-    this.view.webview.postMessage(problem);
+  updateContents(problem, currentLanguage) {
+    this.view.webview.postMessage({problem, currentLanguage});
   }
 }

@@ -68,9 +68,14 @@
   });
 
   window.addEventListener("message", (event) => {
-    const data = event.data;
-    titleRef.innerHTML = `<code>${data.title}</code>`;
-    descripRef.innerHTML = `<code>${data.content}</code>`;
+    const { problem, currentLanguage } = event.data;
+     console.log("received message:", { problem, currentLanguage });
+    titleRef.innerHTML = `<code>${problem.title}</code>`;
+    descripRef.innerHTML = `<code>${problem.content}</code>`;
+
+    if (currentLanguage) {
+      dropdown.value = currentLanguage;
+    }
   });
 </script>
 </html>

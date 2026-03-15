@@ -224,7 +224,7 @@ export class Engine {
 	 * @param {import("@leetnotion/leetcode-api").Problem} problem Problem data queried from Leetcode
 	 */
 	sendPanelData(problem) {
-		this.panelDataProvider.updateContents(problem);
+		this.panelDataProvider.updateContents(problem, this.currentLanguage);
 	}
 	
 	/**
@@ -266,6 +266,13 @@ export class Engine {
 	async tabChangeHandler(editor) {
 		const filename = editor.document.uri.fsPath;
 		const directoryname = path.dirname(filename);
+
+		// detects the new file type and updates current language
+		const ext = path.extname(filename).slice(1); // e.g. "java", "py"
+		const detectedLang = Object.keys(languages).find(k => languages[k].extension === ext);
+		if (detectedLang) {
+			this.currentLanguage = detectedLang;
+		}
 
 		const matches = directoryname.match(/\d+$/);
 		const index = parseInt(matches[0]);
