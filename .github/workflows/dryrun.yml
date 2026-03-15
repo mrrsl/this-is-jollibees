@@ -8,7 +8,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     defaults:
-      run+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++:
+      run:
         working-directory: .
     steps:
       - name: Checkout
