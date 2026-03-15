@@ -258,7 +258,12 @@ export class Engine {
 			result += part;
 		}
 
-		return result;
+		// slices off the ``` ticks that copilot adds for code generation
+		result = result.slice(3 + this.currentLanguage.length);
+		result = result.slice(0, result.length - 3);
+		result = result.trimStart().trimEnd();
+
+		return result; 
 	}
 
 	/**

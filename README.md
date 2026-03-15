@@ -7,11 +7,10 @@
     * ~~Problem source code generation~~
     * ~~Test runner code generation~~ Cannot do this since getting the expected output requries running throug LC
     * ~~Copilot test case generation that can be copy pasted to the LeetCode window~~
-    * format the test case output to be copy pastable
+    * ~~format the test case output to be copy pastable~~
     * ~~change the test files to be the same ext type as the solution file~~
     * ~~update the dropdown menu selector to be the language you have it as~~
     * vscode launch config generator
-3) Load question details
+3) ~~Load question details~~
 4) Credential Input
 5) ~~Add GitHub Copilot as a dependency~~
-6) Change Copilot call to using an api (gemini?) <- ONLY IF THERE IS TIME (even then probably not, just a thought)
