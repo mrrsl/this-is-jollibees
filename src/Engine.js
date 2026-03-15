@@ -101,43 +101,47 @@ export class Engine {
 			return;
 		}
 
-    // per language configuration can be done here
-    const workspacePath = vscode.workspace.workspaceFolders[0].uri.fsPath;
-    const problemPath = path.join(workspacePath, clampFileName(this.problemData));
+        // per language configuration can be done here
+        const workspacePath = vscode.workspace.workspaceFolders[0].uri.fsPath;
+        const problemPath = path.join(workspacePath, clampFileName(this.problemData));
 
-    try {
-      	if (!fs.existsSync(problemPath)) {
-        	fs.mkdirSync(problemPath);
-      	}
-    } catch (error) {
-      	vscode.window.showErrorMessage(
-        	`Error creating ${clampFileName(this.problemData)} folder: ${error.message},`,
-      	);
+        try {
+            if (!fs.existsSync(problemPath)) {
+                fs.mkdirSync(problemPath);
+            }
+            else {
+                vscode.window.showInformationMessage("Problem has already been imported!");
+            }
+        } catch (error) {
+            vscode.window.showErrorMessage(
+                `Error creating ${clampFileName(this.problemData)} folder: ${error.message},`,
+            );
+        }
+        
+        const solutionPath = path.join(problemPath, "solution.js");
+        const selectedLanguage = this.problemData.codeSnippets.filter((cs) => cs.lang == "JavaScript");
+        const content = selectedLanguage[0].code;
+
+        //create solution file
+        try {
+            if (!fs.existsSync(solutionPath)) {
+                await fs.promises.writeFile(solutionPath, content);
+                vscode.window.showInformationMessage("Solution file created");
+            }
+
+            const fileUri = vscode.Uri.file(solutionPath);
+            const doc = await vscode.workspace.openTextDocument(fileUri);
+            await vscode.window.showTextDocument(doc, { 
+            viewColumn: vscode.ViewColumn.Active,
+            preview: false  // ✅ forces a permanent tab, not a preview tab
+            });
+        } catch (error) {
+            vscode.window.showErrorMessage(`Error creating solution file: ${error.message}`);
+        }
+
+        //update panel data
+        this.sendPanelData(this.problemData);
     }
-    const solutionPath = path.join(problemPath, "solution.js");
-    const selectedLanguage = this.problemData.codeSnippets.filter((cs) => cs.lang == "JavaScript");
-    const content = selectedLanguage[0].code;
-
-    //create solution file
-    try {
-		if (!fs.existsSync(solutionPath)) {
-        	await fs.promises.writeFile(solutionPath, content);
-		}
-		vscode.window.showInformationMessage("Solution file created");
-
-		const fileUri = vscode.Uri.file(solutionPath);
-        const doc = await vscode.workspace.openTextDocument(fileUri);
-        await vscode.window.showTextDocument(doc, { 
-    	viewColumn: vscode.ViewColumn.Active,
-    	preview: false  // ✅ forces a permanent tab, not a preview tab
-		});
-    } catch (error) {
-		vscode.window.showErrorMessage(`Error creating solution file: ${error.message}`);
-    }
-
-    //update panel data
-    this.sendPanelData(this.problemData);
-  }
 
 	getPanelProvider() {
 		return this.panelDataProvider;
@@ -145,7 +149,7 @@ export class Engine {
 
 
 	/**
-	 * @returns 
+	 * @returns Copilot test case responses 
 	 */
 	async generateTests() {
 		const models = await vscode.lm.selectChatModels({
@@ -175,7 +179,6 @@ export class Engine {
 	 * @param {string} language Expect proper name here
 	 */
 	selectLanguage(language) {
-
 		this.currentLanguage = language;
 	}
 
