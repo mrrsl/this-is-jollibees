@@ -62,6 +62,11 @@
           "id": "leet-panel",
           "title": "Problem Description",
           "icon": "resources/icons/leet.png"
+        },
+        {
+          "id": "leet-test-panel",
+          "title": "Test cases",
+          "icon": "resources/icons/leet.png"
         }
       ]
     },
@@ -79,6 +84,12 @@
           "name": "Run Solution",
           "type": "webview",
           "icon": "resources/icons/leet.png"
+        },
+        {
+          "id": "leet-test-view",
+          "name": "Get test cases",
+          "type": "webview",
+          "icon": "resources/icons/leet.png"
         }
       ]
     },
@@ -89,23 +100,25 @@
           "when": "viewItem == importable",
           "group": "inline"
         }
-      ]
-      ,
+      ],
       "view/title": [
         {
           "command": "leet.page-up",
           "when": "view == leet-browse-view",
           "group": "navigation",
-          "arguments": [false]
+          "arguments": [
+            false
+          ]
         },
         {
           "command": "leet.page-down",
           "icon": "$(chevron-down)",
           "when": "view == leet-browse-view",
           "group": "navigation",
-          "arguments": [true]
-        }
-        ,
+          "arguments": [
+            true
+          ]
+        },
         {
           "command": "leet.create-test-cases",
           "when": "view == leet-run-view",

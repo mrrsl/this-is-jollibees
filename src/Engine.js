@@ -8,6 +8,7 @@ import path from "path";
 import { LeetProblemProvider, LeetHeading } from "./LeetProblemBrowse.js";
 
 import { ProblemDescriptionProvider } from "./problem-description/ProblemDescription.js";
+import { TestCaseProvider } from "./test-cases/TestCases.js";
 
 /**
  * State manager for the extension. Determines if user is logged in and can access features like submitting runnable solutions
@@ -30,6 +31,9 @@ export class Engine {
 
   /** @type {ProblemDescriptionProvider} Data provider for the bottom panel view. */
   panelDataProvider;
+
+  /** @type {TestCaseProvider} Data provider for the bottom panel view. */
+  testCaseDataProvider;
 
   /** @type {string} Current language being worked in. */
   currentLanguage;
@@ -58,6 +62,7 @@ export class Engine {
 
     this.sidePanelProvider = new LeetProblemProvider(this.apiEntry);
     this.panelDataProvider = new ProblemDescriptionProvider(extensionRootUri);
+    this.testCaseDataProvider = new TestCaseProvider(extensionRootUri);
   }
 
   /**
@@ -140,10 +145,17 @@ export class Engine {
     return this.panelDataProvider;
   }
 
+  getTestDataProvider() {
+    return this.testCaseDataProvider;
+  }
+
   /**
    * Generate test cases for the currently loaded problem using the language model.
    */
-  async createTestCases() {}
+  async createTestCases() {
+    const casesAndAnswers = await this.generateTests(this.problemData.content);
+    this.sendTestCaseData(casesAndAnswers);
+  }
   /**
    * Set the environment language
    *
@@ -160,6 +172,10 @@ export class Engine {
    */
   sendPanelData(problem) {
     this.panelDataProvider.updateContents(problem);
+  }
+
+  sendTestCaseData(text) {
+    this.testCaseDataProvider.updateContents(text);
   }
 
   /**

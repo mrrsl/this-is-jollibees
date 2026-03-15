@@ -3,11 +3,11 @@ import * as fs from "fs";
 import * as path from "path";
 
 /**
- * Connector class to make src/problem-description/index.html visible to the extension
+ * Connector class to make src/test-cases/index.html visible to the extension
  *
  * @implements {vscode.WebviewViewProvider}
  */
-export class ProblemDescriptionProvider {
+export class TestCaseProvider {
   /** @type {vscode.WebviewView} */
   view;
 
@@ -48,12 +48,7 @@ export class ProblemDescriptionProvider {
    *
    */
   generateHtml(view) {
-    const indexPath = vscode.Uri.joinPath(
-      this.extensionRoot,
-      "src",
-      "problem-description",
-      "index.html",
-    );
+    const indexPath = vscode.Uri.joinPath(this.extensionRoot, "src", "test-cases", "index.html");
 
     fs.readFile(indexPath.fsPath, (err, data) => {
       if (!err) this.view.webview.html = data.toString();
@@ -66,15 +61,15 @@ export class ProblemDescriptionProvider {
    * @param {string} filename Name of resource file to access within the ViewProvider's directory.
    */
   makePath(filename) {
-    return vscode.Uri.joinPath(this.extensionRoot, "src", "problem-description", filename);
+    return vscode.Uri.joinPath(this.extensionRoot, "src", "test-cases", filename);
   }
 
   /**
-   * Sends data to the panel webview so it can update its contents for a different problem
+   * Sends data to the panel webview so it can update its contents for the test cases of this problem
    *
-   * @param {import("@leetnotion/leetcode-api").Problem} problem
+   * @param {string} testCases
    */
-  updateContents(problem) {
-    this.view.webview.postMessage(problem);
+  updateContents(testCases) {
+    this.view.webview.postMessage(testCases);
   }
 }

@@ -16,33 +16,20 @@ import { DifficultyDecorationProvider } from "./src/LeetProblemBrowse.js";
  * @param {vscode.ExtensionContext} context
  */
 export function activate(context) {
-    console.log("extension active");
+  console.log("extension active");
 
-    const extRunner = new Engine(context.extensionUri, "solution");
+  const extRunner = new Engine(context.extensionUri, "solution");
 
-    vscode.window.registerFileDecorationProvider( 
-        new DifficultyDecorationProvider()
-    ),
+  (vscode.window.registerFileDecorationProvider(new DifficultyDecorationProvider()),
+    vscode.commands.registerCommand("leet.import-problem", (p) => extRunner.importProblem(p)));
 
-    vscode.commands.registerCommand(
-        "leet.import-problem",
-		(p) => extRunner.importProblem(p)
-    );
+  vscode.commands.registerCommand("leet.create-test-cases", () => extRunner.createTestCases());
 
-    vscode.commands.registerCommand(
-        "leet.create-test-cases",
-        () => extRunner.createTestCases(),
-    );
+  vscode.window.registerTreeDataProvider("leet-browse-view", extRunner.getSidePanelProvider());
 
-    vscode.window.registerTreeDataProvider(
-        "leet-browse-view",
-        extRunner.getSidePanelProvider(),
-    );
+  vscode.window.registerWebviewViewProvider("leet-run-view", extRunner.getPanelProvider());
 
-    vscode.window.registerWebviewViewProvider(
-        "leet-run-view",
-        extRunner.getPanelProvider(),
-    );
+  vscode.window.registerWebviewViewProvider("leet-test-view", extRunner.getTestDataProvider());
 }
 
 export function deactivate() {}
