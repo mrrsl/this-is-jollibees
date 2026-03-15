@@ -33,8 +33,8 @@ jobs:
 
       - name: Substitue for actual API keys
         run: |
-          sed -E "s/\\{\s*?apiKey\s*?:.+?\}/{apiKey: ${{ secrets.GEMINI_KEY }}}" > src/Engine.js
-          cat src/Gemini.js | grep "-E "const GEMINI_KEY = [^\n]+" > /dev/null
+          sed -E "s/\\{\s*?apiKey\s*?:.+?\}/{apiKey:${{ secrets.GEMINI_KEY }}}" > src/Engine.js
+          grep -E "/\{apiKey:.+?\}" src/Engine.js > /dev/null
           if [ $? -ne 0 ]
             echo "Key substitution failed"
             exit 1
