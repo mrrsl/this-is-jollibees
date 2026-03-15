@@ -6,6 +6,12 @@ import {
 
 const batchSize = 100;
 
+export const Difficulty = {
+    EASY: 1,
+    MEDIUM: 2,
+    HARD: 3,
+}
+
 /**
  * Provider for the problem list view
  * 
@@ -16,11 +22,14 @@ export class LeetProblemProvider {
     /** @type {Array<Object>} */
     visibleProblemList;
 
+    /** @type {Array<Object>} Cache of fetched questions. */
+    cachedProblems;
+
     /** @type {LeetCode} */
     lcQuery;
 
-    /** @type {number} Number for paging problem queries. */
-    problemListOffset;
+    /** @type {{limit?: number, offset?:number, filters?: { difficulty?: "EASY" | "MEDIUM" | "HARD", tags?:string[]}}} */
+    currentFilter;
 
     /** @type {vscode.EventEmitter} */
     changeEmitter;
@@ -39,14 +48,19 @@ export class LeetProblemProvider {
     constructor(api) {
 
         this.visibleProblemList = [];
+        this.cachedProblems = []
         this.lcQuery = api;
-        this.problemListOffset = 0;
+        this.currentFilter = {
+            filters: {
+                difficulty: null
+            },
+            offset: 0
+        };
+
         this.changeEmitter = new vscode.EventEmitter();
         this.onDidChangeTreeData = this.changeEmitter.event;
 
-        this.getProblems(this.problemListOffset).then(
-
-        );
+        this.loadProblems();
     }
 
     /**
@@ -79,64 +93,90 @@ export class LeetProblemProvider {
     /**
      * Appends to the visible problem list.
      * 
-     * @param {import("@leetnotion/leetcode-api").ProblemList} pList Problem list returned by the `problems` function.
      */
-    processProblemList(pList) {
-        
-        const additions = pList.questions.map(p => new LeetHeading(p.questionFrontendId, p.title, p));
+    setVisibleProblemList(pList) {
 
-        this.visibleProblemList = additions;
-
-        return Promise.resolve(this.visibleProblemList);
+        this.visibleProblemList = pList.map(o => o);
+        this.changeEmitter.fire();
     }
 
     /**
-     * Progressively retrieve the entire Leetcodep problem set.
-     * 
-     * @param {number} [offset]
-     * 
-     * @returns {Promise<LeetItem[]>}
+     * Loads the entire collection of problems.
      */
-    async getProblems(offset) {
+    async loadProblems() {
+        if (this.cachedProblems.length > 0)
+            return;
 
-        this.problemListOffset = (offset) ? offset : 0;
-        const filter = {
-            offset: this.problemListOffset
+        let batch = await this.lcQuery.problems();
+
+        const limit = batch.total;
+        this.cachedProblems = batch.questions.map(p => new LeetHeading(p));
+        
+        // Display initial batch so user isn't left waiting
+        this.setVisibleProblemList(this.cachedProblems);
+
+
+        while (this.cachedProblems.length < limit) {
+
+            batch = await this.lcQuery.problems({offset: this.cachedProblems.length});
+            const batchHeadings = batch.questions.map(p => new LeetHeading(p));
+            this.cachedProblems = [...this.cachedProblems, ...batchHeadings];
+
+            if (this.currentFilter.filters.difficulty) {
+                const workingList = this.cachedProblems.filter(q => q.problemData.difficulty.toUpperCase() == this.currentFilter.filters.difficulty);
+                this.setVisibleProblemList(workingList);
+            }
+            else
+                this.showAll();
         }
-        let plist = await this.lcQuery.problems(filter);
-        this.processProblemList(plist);
-        this.maxCount = plist.total;
-
-        // notify consumers that the tree data changed (root refreshed)
-        this.changeEmitter.fire(null);
-
-        return this.visibleProblemList;
     }
 
     /**
-     * Get the next batch of problems to display.
+     * Use {@link Difficulty} for acceptable values.
+     * 
+     * @param {"EASY" | "MEDIUM" | "HARD"} diff 
      */
-    nextProblemBatch() {
-        
-        const nextOffset = this.problemListOffset + batchSize;
+    filterByDifficulty(diff) {
 
-        if (nextOffset >= this.maxCount)
-            return
+        // If the difficulty requested is the same as the one currently being filtered for, then we treat it like a toggle
+        if (diff == this.currentFilter.filters.difficulty) {
+            this.currentFilter.filters.difficulty = null;
+            this.showAll();
+            return;
+        }
 
-        return this.getProblems(nextOffset);
+        switch(diff) {
+            case "EASY":
+                this.currentFilter.filters.difficulty = "EASY";
+                this.showDifficulty("Easy");
+                break;
+
+            case "MEDIUM":
+                this.currentFilter.filters.difficulty = "MEDIUM";
+                this.showDifficulty("Medium");
+                break;
+
+            case "HARD":
+                this.currentFilter.filters.difficulty = "HARD";
+                this.showDifficulty("Hard");
+                break;
+        }
     }
 
     /**
-     * Get the previous batch of problems to display.
+     * Set the visible items to all the items in the cached problems collection
      */
-    prevProblemBatch() {
+    showAll() {
+        this.setVisibleProblemList(this.cachedProblems);
+    }
 
-        let prevOffset = this.problemListOffset - batchSize;
-
-        if (prevOffset < 0)
-            prevOffset = 0;
-
-        return this.getProblems(prevOffset)
+    /**
+     * 
+     * @param {"Easy" | "Medium" | "Hard"} diffString 
+     */
+    showDifficulty(diffString) {
+        const filtered = this.cachedProblems.filter(q => q.problemData.difficulty == diffString);
+        this.setVisibleProblemList(filtered);
     }
 }
 
@@ -168,13 +208,10 @@ export class LeetHeading extends LeetItem {
 
 
     /**
-     * 
-     * @param {string | number} num 
-     * @param {string} title 
      * @param {any} data Individual element from the {@link ProblemList} `questions` array
      */
-    constructor(num, title, data) {
-        super(`${num}. ${title}`, vscode.TreeItemCollapsibleState.Collapsed);
+    constructor(data) {
+        super(`${data.questionFrontendId}. ${data.title}`, vscode.TreeItemCollapsibleState.Collapsed);
 
         this.children = [];
         this.problemData = data;;
