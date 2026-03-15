@@ -47,7 +47,7 @@ export class ProblemDescriptionProvider {
     // checks for messages from the webview, and if its a setLanguage command, set the current language to the new language
     this.view.webview.onDidReceiveMessage((message) => {
       if (message.command === "setLanguage") {
-        this.currentLanguage = message.language;
+        this.onLanguageChange?.(message.language);
       }
     });
   }
