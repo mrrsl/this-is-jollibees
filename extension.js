@@ -16,20 +16,46 @@ import { DifficultyDecorationProvider } from "./src/LeetProblemBrowse.js";
  * @param {vscode.ExtensionContext} context
  */
 export function activate(context) {
-  console.log("extension active");
+    console.log("extension active");
 
-  const extRunner = new Engine(context.extensionUri, "solution");
+    const extRunner = new Engine(context.extensionUri, "solution");
+	const tabChange = vscode.window.onDidChangeActiveTextEditor(editor => extRunner.tabChangeHandler(editor));
+4
+    vscode.window.registerFileDecorationProvider( 
+        new DifficultyDecorationProvider()
+    ),
 
-  (vscode.window.registerFileDecorationProvider(new DifficultyDecorationProvider()),
-    vscode.commands.registerCommand("leet.import-problem", (p) => extRunner.importProblem(p)));
+    vscode.commands.registerCommand(
+        "leet.import-problem",
+		(p) => extRunner.importProblem(p)
+    );
 
-  vscode.commands.registerCommand("leet.create-test-cases", () => extRunner.createTestCases());
+	vscode.commands.registerCommand(
+		"leet.page-down",
+		() => extRunner.pageProblems(false)
+	);
 
-  vscode.window.registerTreeDataProvider("leet-browse-view", extRunner.getSidePanelProvider());
+	vscode.commands.registerCommand(
+		"leet.page-up",
+		() => extRunner.pageProblems(true)
+	);
 
-  vscode.window.registerWebviewViewProvider("leet-run-view", extRunner.getPanelProvider());
+    vscode.commands.registerCommand(
+        "leet.create-test-cases",
+        (p) => extRunner.generateTests(),
+    );
 
-  vscode.window.registerWebviewViewProvider("leet-test-view", extRunner.getTestDataProvider());
+    vscode.window.registerTreeDataProvider(
+        "leet-browse-view",
+        extRunner.getSidePanelProvider(),
+    );
+
+    vscode.window.registerWebviewViewProvider(
+        "leet-run-view",
+        extRunner.getPanelProvider(),
+    );
+	
+	context.subscriptions.push(tabChange);
 }
 
 export function deactivate() {}
