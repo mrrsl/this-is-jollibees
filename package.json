@@ -3,7 +3,7 @@
   "name": "plylf",
   "displayName": "PLYLF",
   "description": "leetcode problem exporter AKA Practice Leetcode You Lazy Freak",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
   "engines": {
     "vscode": "^1.100.0"
@@ -13,6 +13,9 @@
   ],
   "activationEvents": [
     "onStartupFinished"
+  ],
+  "extensionDependencies": [
+    "GitHub.copilot-chat"
   ],
   "main": "./extension.js",
   "contributes": {
@@ -48,6 +51,26 @@
         "command": "leet.page-up",
         "title": "Up",
         "icon": "$(chevron-up)"
+      },
+      {
+        "command": "leet.set-filter-hard",
+        "title": "Hard",
+        "icon": "$(star-full)"
+      },
+      {
+        "command": "leet.set-filter-med",
+        "title": "Medium",
+        "icon": "$(star-half)"
+      },
+      {
+        "command": "leet.set-filter-easy",
+        "title": "Easy",
+        "icon": "$(star-empty)"
+      },
+      {
+        "command": "leet.toggle-sort",       
+        "title": "Toggle Sort Order",
+        "icon": "$(arrow-swap)"
       }
     ],
     "viewsContainers": {
@@ -94,23 +117,29 @@
       ,
       "view/title": [
         {
-          "command": "leet.page-up",
-          "when": "view == leet-browse-view",
-          "group": "navigation",
-          "arguments": [false]
-        },
-        {
-          "command": "leet.page-down",
-          "icon": "$(chevron-down)",
-          "when": "view == leet-browse-view",
-          "group": "navigation",
-          "arguments": [true]
-        }
-        ,
-        {
           "command": "leet.create-test-cases",
           "when": "view == leet-run-view",
           "group": "navigation"
+        },
+             {
+          "command": "leet.toggle-sort",
+          "when": "view == leet-browse-view",
+          "group": "navigation@1"
+        },
+        {
+          "command": "leet.set-filter-hard",
+          "when": "view == leet-browse-view",
+          "group": "navigation@4"
+        },
+        {
+          "command": "leet.set-filter-med",
+          "when": "view == leet-browse-view",
+          "group": "navigation@3"
+        },
+        {
+          "command": "leet.set-filter-easy",
+          "when": "view == leet-browse-view",
+          "group": "navigation@2"
         }
       ]
     },

@@ -5,11 +5,13 @@ import * as vscode from "vscode";
 import fs from "fs";
 import path from "path";
 
-import { LeetProblemProvider, LeetHeading } from "./LeetProblemBrowse.js";
+import { LeetProblemProvider, LeetHeading, Difficulty } from "./LeetProblemBrowse.js";
 
 import { ProblemDescriptionProvider } from "./problem-description/ProblemDescription.js";
 
 import { SlugMap } from "./SlugMap.js";
+
+import { languages } from "./languages.js";
 
 /**
  * State manager for the extension. Determines if user is logged in and can access features like submitting runnable solutions
@@ -50,7 +52,7 @@ export class Engine {
 	constructor(extensionRootUri, solutionfilename, session, csrf) {
 		this.authenticated = false;
 		this.solutionFile = solutionfilename;
-		this.language = "JavaScript";
+		this.currentLanguage = "JavaScript";
 
 		if (session && csrf) {
 			const cred = new Credential({ csrf: csrf, session: session });
@@ -62,8 +64,41 @@ export class Engine {
 
 		this.sidePanelProvider = new LeetProblemProvider(this.apiEntry);
 		this.panelDataProvider = new ProblemDescriptionProvider(extensionRootUri);
+
+		this.setupLanguageChange();
 	}
 
+	/**
+	 * Sets up the handler for when user changes the language they're working in.
+	 */
+	setupLanguageChange() {
+		this.panelDataProvider.onLanguageChange = async (newLanguage) => {
+		this.currentLanguage = newLanguage;
+
+			if (this.problemData) {
+				const problemPath = await this.createProblemFolder();
+
+				if (problemPath) {
+					await this.createSolutionFile(problemPath);
+				}
+
+				this.sendPanelData(this.problemData);
+				vscode.window.showInformationMessage(`Language changed to ${newLanguage}`);
+			}
+		};
+	}
+
+	/**
+	 * Calls the functions to import the current problem folder and solution file into the user workspace.
+	 * @returns false if the problem folder could not be created, otherwise no return value
+	 */
+	async importProblemFiles() {
+		const problemPath = await this.createProblemFolder();
+		if (!problemPath) return;
+
+		await this.createSolutionFile(problemPath);
+		this.sendPanelData(this.problemData);
+	}
 
 	/**
 	 * Command handler for importing problems
@@ -82,28 +117,36 @@ export class Engine {
 				`Error while loading '${heading.problemData.title}': ${err}`,
 				),
 			)
-			.then(this.createSolutionFile.bind(this));
+			.then(this.importProblemFiles.bind(this));
+	}
+
+	/**
+	 * Getter for the main panel provider.
+	 * 
+	 * @returns the main panel provider
+	 */
+	getPanelProvider() {
+		return this.panelDataProvider;
 	}
 
 	/**
 	 * Getter for side panel data provider.
+	 * 
+	 * @returns the side panel provider
 	 */
 	getSidePanelProvider() {
 		return this.sidePanelProvider;
 	}
 
 	/**
-	 * Attempt to create a solution file in the current workspace folder.
-	 *
-	 * @return {Promise<void>}
+	 * Attempts to create a folder for the current problem and returns the path to that folder.
+	 * @returns the path to the problem folder as a string
 	 */
-	async createSolutionFile() {
+	async createProblemFolder() {
 		if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
 			vscode.window.showErrorMessage("No workspace is open");
 			return;
 		}
-
-    		// per language configuration can be done here
     		const workspacePath = vscode.workspace.workspaceFolders[0].uri.fsPath;
     		const problemPath = path.join(workspacePath, clampFileName(this.problemData));
 
@@ -111,52 +154,73 @@ export class Engine {
             if (!fs.existsSync(problemPath)) {
                 fs.mkdirSync(problemPath);
             }
-            else {
-                vscode.window.showInformationMessage("Problem has already been imported!");
-            }
         } catch (error) {
             vscode.window.showErrorMessage(
                 `Error creating ${clampFileName(this.problemData)} folder: ${error.message},`,
             );
         }
-        
-        const solutionPath = path.join(problemPath, "solution.js");
-        const selectedLanguage = this.problemData.codeSnippets.filter((cs) => cs.lang == "JavaScript");
+
+		return problemPath;
+	}
+
+	/**
+	 * Creates a solution file with the code snippet from the Leetcode problem data and saves it in problemPath.
+	 * 
+	 * @param {string} problemPath the path to the problem folder of that specific question, where the solution file should be created.
+	 */
+	async createSolutionFile(problemPath) {
+		// all this just gets the correct file extension and assigns it to the solution file to be created as the current language
+		const langConfig = languages[this.currentLanguage];
+		const fileType = typeof langConfig === 'object' ? langConfig.extension : "js";
+		const solutionPath = path.join(problemPath, `solution.${fileType}`);
+
+        const selectedLanguage = this.problemData.codeSnippets.filter((cs) => cs.lang == this.currentLanguage);
         const content = selectedLanguage[0].code;
 
-        //create solution file
         try {
             if (!fs.existsSync(solutionPath)) {
                 await fs.promises.writeFile(solutionPath, content);
                 vscode.window.showInformationMessage("Solution file created");
-            }
+            } else {
+				vscode.window.showInformationMessage("Solution file already exists.");
+			}
 
             const fileUri = vscode.Uri.file(solutionPath);
             const doc = await vscode.workspace.openTextDocument(fileUri);
             await vscode.window.showTextDocument(doc, { 
             viewColumn: vscode.ViewColumn.Active,
-            preview: false  // ✅ forces a permanent tab, not a preview tab
+            preview: false  // forces a permanent tab, not a preview tab
             });
+						
         } catch (error) {
             vscode.window.showErrorMessage(`Error creating solution file: ${error.message}`);
         }
-
-        //update panel data
-        this.sendPanelData(this.problemData);
-    }
-
-	getPanelProvider() {
-		return this.panelDataProvider;
 	}
 
 	/**
-	 * Set the environment language
+	 * Creates a test case file with the response generated by Copilot and saves it in problemPath.
 	 * 
-	 * @param {string} language Expect proper name here
+	 * @param {string} problemPath the path to the problem folder of that specific question, where the tests file should be created.
 	 */
-	selectLanguage(language) {
-		this.currentLanguage = language;
-	}
+	async createTestsFile(problemPath) {
+		// this is repeated from createSolutionFile, getting the correct file extension to create the test files with
+		const langConfig = languages[this.currentLanguage];
+		const fileType = typeof langConfig === 'object' ? langConfig.extension : "js";
+		const testCasesPath = path.join(problemPath, `tests.${fileType}`);
+
+		try {
+			const testContent = (await this.generateTests()) || "//LLM failed to respond.";
+			if (!fs.existsSync(testCasesPath)) {
+				await fs.promises.writeFile(testCasesPath, testContent);
+				vscode.window.showInformationMessage("Tests file created");
+			}	
+		} catch (e) {
+			vscode.window.showErrorMessage(`Problem folder does not exist! Somehow? ${e.message}`)
+		}
+
+        //update panel data
+        this.sendPanelData(this.problemData);
+	} 
 
 	/**
 	 * Tells the vscode panel to update the content in the solution runner.
@@ -164,26 +228,11 @@ export class Engine {
 	 * @param {import("@leetnotion/leetcode-api").Problem} problem Problem data queried from Leetcode
 	 */
 	sendPanelData(problem) {
-		this.panelDataProvider.updateContents(problem);
-	}
-
-	/**
-	 * 
-	 * @param {boolean} pageup Set true to get next batch of problems, false to get previous batch
-	 */
-	pageProblems(pageup) {
-		
-		const side = this.sidePanelProvider;
-
-		if (pageup)
-			side.prevProblemBatch();
-		else
-			side.nextProblemBatch();
+		this.panelDataProvider.updateContents(problem, this.currentLanguage);
 	}
 	
 	/**
-	 * 
-	 * @returns 
+	 * @returns the test cases generated by Copilot
 	 */
 	async generateTests() {
 		const models = await vscode.lm.selectChatModels({
@@ -198,13 +247,25 @@ export class Engine {
 		}
 
 		const messages = [
-			vscode.LanguageModelChatMessage.User('You are a software engineer trying to create test cases for a leetcode problem to test all general and edge cases.'),
-			vscode.LanguageModelChatMessage.User('This is the problem description, generate me test cases for the following problem: ' + this.problemData.content)
+			vscode.LanguageModelChatMessage.User(`You are a software engineer trying to create test cases in` + this.currentLanguage + ` for a leetcode problem to test all general and edge cases.`),
+			vscode.LanguageModelChatMessage.User(`This is the problem description, generate me test cases for the following problem, and DO NOT respond with anything BUT the test cases: ` + this.problemData.content)
 		];
+			
+		const tokenSource = new vscode.CancellationTokenSource();
+		const response = await model.sendRequest(messages, {}, tokenSource.token);
 
-		const response = await model.sendRequest(messages);
+		// to parse the response stream into a string
+		let result = ``;
+		for await (const part of response.text) {
+			result += part;
+		}
 
-		return response;
+		// slices off the ``` ticks that copilot adds for code generation
+		result = result.slice(3 + this.currentLanguage.length);
+		result = result.slice(0, result.length - 3);
+		result = result.trimStart().trimEnd();
+
+		return result; 
 	}
 
 	/**
@@ -212,8 +273,19 @@ export class Engine {
 	 * @param {vscode.TextEditor} editor 
 	 */
 	async tabChangeHandler(editor) {
+		
+		if (editor == null)
+			return;
+		
 		const filename = editor.document.uri.fsPath;
 		const directoryname = path.dirname(filename);
+
+		// detects the new file type and updates current language
+		const ext = path.extname(filename).slice(1); // e.g. "java", "py"
+		const detectedLang = Object.keys(languages).find(k => languages[k].extension === ext);
+		if (detectedLang) {
+			this.currentLanguage = detectedLang;
+		}
 
 		const matches = directoryname.match(/\d+$/);
 		const index = parseInt(matches[0]);
@@ -222,8 +294,30 @@ export class Engine {
 		this.problemData = await this.apiEntry.problem(updatedSlug);
 		this.sendPanelData(this.problemData);
 	}
+
+	/** Filter for only hard problems. */
+	filterHard() {
+		this.sidePanelProvider.filterByDifficulty("HARD");
+	}
+
+	/** Filter for only medium problems. */
+	filterMedium() {
+		this.sidePanelProvider.filterByDifficulty("MEDIUM");
+	}
+
+	/** Filter for only easy problems. */
+	filterEasy() {
+		this.sidePanelProvider.filterByDifficulty("EASY");
+	}
 }
 
+/**
+ * Formats the file to have no empty spaces and seperate the title and id with a dash.
+ * Ex. "Two Sum" becomes "TwoSum-1"
+ * 
+ * @param {import("@leetnotion/leetcode-api").Problem} problem 
+ * @returns the formatted problem title as a string
+ */
 function clampFileName(problem) {
-	return problem.title.replace(" ", "") + ("-") + problem.questionFrontendId;
+	return problem.title.replaceAll(" ", "") + ("-") + problem.questionFrontendId;
 }
