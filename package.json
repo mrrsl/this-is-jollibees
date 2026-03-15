@@ -3,7 +3,7 @@
   "name": "plylf",
   "displayName": "PLYLF",
   "description": "leetcode problem exporter AKA Practice Leetcode You Lazy Freak",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "type": "module",
   "engines": {
     "vscode": "^1.100.0"
