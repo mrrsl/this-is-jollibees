@@ -48,6 +48,21 @@
         "command": "leet.page-up",
         "title": "Up",
         "icon": "$(chevron-up)"
+      },
+      {
+        "command": "leet.set-filter-hard",
+        "title": "Hard",
+        "icon": "$(star-full)"
+      },
+      {
+        "command": "leet.set-filter-med",
+        "title": "Medium",
+        "icon": "$(star-half)"
+      },
+      {
+        "command": "leet.set-filter-easy",
+        "title": "Easy",
+        "icon": "$(star-empty)"
       }
     ],
     "viewsContainers": {
@@ -94,22 +109,23 @@
       ,
       "view/title": [
         {
-          "command": "leet.page-up",
-          "when": "view == leet-browse-view",
-          "group": "navigation",
-          "arguments": [false]
-        },
-        {
-          "command": "leet.page-down",
-          "icon": "$(chevron-down)",
-          "when": "view == leet-browse-view",
-          "group": "navigation",
-          "arguments": [true]
-        }
-        ,
-        {
           "command": "leet.create-test-cases",
           "when": "view == leet-run-view",
+          "group": "navigation"
+        },
+        {
+          "command": "leet.set-filter-hard",
+          "when": "view == leet-browse-view",
+          "group": "navigation"
+        },
+        {
+          "command": "leet.set-filter-med",
+          "when": "view == leet-browse-view",
+          "group": "navigation"
+        },
+        {
+          "command": "leet.set-filter-easy",
+          "when": "view == leet-browse-view",
           "group": "navigation"
         }
       ]
@@ -134,7 +150,7 @@
   "devDependencies": {
     "@types/mocha": "^10.0.10",
     "@types/node": "22.x",
-    "@types/vscode": "^1.110.0",
+    "@types/vscode": "^1.100.0",
     "@vscode/test-cli": "^0.0.11",
     "@vscode/test-electron": "^2.5.2",
     "eslint": "^9.39.3"

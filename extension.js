@@ -30,16 +30,6 @@ export function activate(context) {
 		(p) => extRunner.importProblem(p)
     );
 
-	vscode.commands.registerCommand(
-		"leet.page-down",
-		() => extRunner.pageProblems(false)
-	);
-
-	vscode.commands.registerCommand(
-		"leet.page-up",
-		() => extRunner.pageProblems(true)
-	);
-
     vscode.commands.registerCommand(
         "leet.create-test-cases",
         async () => {
@@ -47,6 +37,21 @@ export function activate(context) {
         if (problemPath) await extRunner.createTestsFile(problemPath);
     }
     );
+
+	vscode.commands.registerCommand(
+		"leet.set-filter-easy",
+		() => extRunner.filterEasy()
+	);
+
+	vscode.commands.registerCommand(
+		"leet.set-filter-med",
+		() => extRunner.filterMedium()
+	);
+
+	vscode.commands.registerCommand(
+		"leet.set-filter-hard",
+		() => extRunner.filterHard()
+	);
 
     vscode.window.registerTreeDataProvider(
         "leet-browse-view",
