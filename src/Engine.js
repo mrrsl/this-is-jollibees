@@ -119,7 +119,15 @@ export class Engine {
 		const solutionPath = path.join(problemPath, "solution.js");
 		const selectedLanguage = this.problemData.codeSnippets.filter((cs) => cs.lang == "JavaScript");
 		const content = selectedLanguage[0].code;
+		vscode.window.showInformationMessage("Solution file created");
 
+		const fileUri = vscode.Uri.file(solutionPath);
+        const doc = await vscode.workspace.openTextDocument(fileUri);
+        await vscode.window.showTextDocument(doc, { 
+    	viewColumn: vscode.ViewColumn.Active,
+    	preview: false  // ✅ forces a permanent tab, not a preview tab
+		});
+		
 		//create solution file
 		try {
 			if (!fs.existsSync(solutionPath)) {
