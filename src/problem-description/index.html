@@ -30,6 +30,7 @@
     </style>
   </head>
   <body>
+    <select id="laguage-selection"></select>
     <div class="container">
       <h2 id="title">Problem Description</h2>
       <p id="description">This is where the problem description is.</p>
@@ -38,6 +39,27 @@
   <script>
     const titleRef = document.getElementById("title");
     const descripRef = document.getElementById("description");
+    const languages = {
+      "C++":        { extension: "cpp", },
+      "Java":       { extension: "java" },
+      "Python3":    { extension: "py"   },
+      "Python":     { extension: "py"   },
+      "JavaScript": { extension: "js"   },
+      "TypeScript": { extension: "ts"   },
+      "C#":         { extension: "cs"   },
+      "C":          { extension: "c"    },
+      "Go":         { extension: "go"   },
+      "Kotlin":     { extension: "kt"   },
+      "Swift":      { extension: "swift"},
+      "Rust":       { extension: "rs"   },
+      "Ruby":       { extension: "rb"   },
+      "PHP":        { extension: "php"  },
+      "Dart":       { extension: "dart" },
+      "Scala":      { extension: "scala"},
+      "Elixir":     { extension: "ex"   },
+      "Erlang":     { extension: "erl"  },
+      "Racket":     { extension: "rkt"  },
+    };
     /*
     List of potential objects that may be passed through the message event
     - Problem from @leetnotion/leetcode-api
