@@ -203,7 +203,9 @@ export class Engine {
 	 * @param {string} problemPath the path to the problem folder of that specific question, where the tests file should be created.
 	 */
 	async createTestsFile(problemPath) {
-		const testCasesPath = path.join(problemPath, "tests.js");
+		const langConfig = languages[this.currentLanguage];
+		const fileType = typeof langConfig === 'object' ? langConfig.extension : "js";
+		const testCasesPath = path.join(problemPath, `tests.${fileType}`);
 		try {
 			const testContent = (await this.generateTests()) || "//LLM failed to respond.";
 			if (!fs.existsSync(testCasesPath)) {
