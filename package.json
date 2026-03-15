@@ -3,12 +3,12 @@
   "name": "plylf",
   "displayName": "PLYLF",
   "description": "leetcode problem exporter AKA Practice Leetcode You Lazy Freak",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "type": "module",
   "engines": {
     "vscode": "^1.100.0"
   },
-  "icons": "resources/icons/lcpaint.png",
+  "icon": "resources/icons/lcpaint.png",
   "categories": [
     "Other"
   ],
