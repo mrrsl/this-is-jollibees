@@ -119,17 +119,17 @@
         {
           "command": "leet.set-filter-hard",
           "when": "view == leet-browse-view",
-          "group": "navigation"
+          "group": "navigation@3"
         },
         {
           "command": "leet.set-filter-med",
           "when": "view == leet-browse-view",
-          "group": "navigation"
+          "group": "navigation@2"
         },
         {
           "command": "leet.set-filter-easy",
           "when": "view == leet-browse-view",
-          "group": "navigation"
+          "group": "navigation@1"
         }
       ]
     },
