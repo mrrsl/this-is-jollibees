@@ -38,6 +38,10 @@ export function activate(context) {
     }
     );
 
+    vscode.commands.registerCommand(
+        "leet.toggle-sort",
+        () => extRunner.getSidePanelProvider().toggleSortOrder()
+    );
 	vscode.commands.registerCommand(
 		"leet.set-filter-easy",
 		() => extRunner.filterEasy()

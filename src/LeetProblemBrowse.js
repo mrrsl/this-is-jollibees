@@ -57,6 +57,8 @@ export class LeetProblemProvider {
             offset: 0
         };
 
+        this.reversed = false;
+
         this.changeEmitter = new vscode.EventEmitter();
         this.onDidChangeTreeData = this.changeEmitter.event;
 
@@ -97,6 +99,10 @@ export class LeetProblemProvider {
     setVisibleProblemList(pList) {
 
         this.visibleProblemList = pList.map(o => o);
+
+        if (this.reversed) {
+            this.visibleProblemList.reverse(); 
+        }
         this.changeEmitter.fire();
     }
 
@@ -163,6 +169,7 @@ export class LeetProblemProvider {
         }
     }
 
+
     /**
      * Set the visible items to all the items in the cached problems collection
      */
@@ -177,6 +184,15 @@ export class LeetProblemProvider {
     showDifficulty(diffString) {
         const filtered = this.cachedProblems.filter(q => q.problemData.difficulty == diffString);
         this.setVisibleProblemList(filtered);
+    }
+
+    /**
+     * Sort order toggle.
+     */
+    toggleSortOrder() {
+    this.reversed = !this.reversed;
+    this.visibleProblemList.reverse();
+    this.changeEmitter.fire(null);
     }
 }
 
@@ -226,7 +242,11 @@ export class LeetHeading extends LeetItem {
         const percentFormat = /\d{1,2}.\d\d/;
         
         let acRateFormatted = new String(data.acRate);
-        acRateFormatted = acRateFormatted.match(percentFormat)[0];
+        let acRateMatches = acRateFormatted.match(percentFormat);
+        if(acRateMatches != null){
+            acRateFormatted = acRateMatches[0];
+        }
+    
 
         const difficultyItem = new LeetColoredText(`Difficulty: ${data.difficulty}`, undefined);
         difficultyItem.resourceUri = vscode.Uri.parse(`leet-difficulty:/${encodeURIComponent(data.difficulty)}`);
