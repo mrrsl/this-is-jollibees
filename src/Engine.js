@@ -14,6 +14,7 @@ import { SlugMap } from "./SlugMap.js";
 import { languages } from "./languages.js";
 
 import { GoogleGenAI } from "@google/genai";
+import { getSystemErrorMap } from "util";
 
 /**
  * State manager for the extension. Determines if user is logged in and can access features like submitting runnable solutions
