@@ -30,9 +30,19 @@ export function activate(context) {
 		(p) => extRunner.importProblem(p)
     );
 
+	vscode.commands.registerCommand(
+		"leet.page-down",
+		() => extRunner.pageProblems(false)
+	);
+
+	vscode.commands.registerCommand(
+		"leet.page-up",
+		() => extRunner.pageProblems(true)
+	);
+
     vscode.commands.registerCommand(
         "leet.create-test-cases",
-        () => extRunner.createTestCases(),
+        (p) => extRunner.generateTests(),
     );
 
     vscode.window.registerTreeDataProvider(
