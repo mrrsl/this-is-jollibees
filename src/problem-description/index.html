@@ -23,7 +23,6 @@
       .container {
         max-width: 100%;
       }
-
       code {
         font-family: monospace;
       }
@@ -37,31 +36,18 @@
     </div>
   </body>
   <script>
+  const languages = {
+    "C++": "cpp", "Java": "java", "Python3": "py", "Python": "py",
+    "JavaScript": "js", "TypeScript": "ts", "C#": "cs", "C": "c",
+    "Go": "go", "Kotlin": "kt", "Swift": "swift", "Rust": "rs",
+    "Ruby": "rb", "PHP": "php", "Dart": "dart", "Scala": "scala",
+    "Elixir": "ex", "Erlang": "erl", "Racket": "rkt"
+  };
+
   const vscode = acquireVsCodeApi();
 
   const titleRef = document.getElementById("title");
   const descripRef = document.getElementById("description");
-  const languages = {
-    "C++":        { extension: "cpp"   },
-    "Java":       { extension: "java"  },
-    "Python3":    { extension: "py"    },
-    "Python":     { extension: "py"    },
-    "JavaScript": { extension: "js"    },
-    "TypeScript": { extension: "ts"    },
-    "C#":         { extension: "cs"    },
-    "C":          { extension: "c"     },
-    "Go":         { extension: "go"    },
-    "Kotlin":     { extension: "kt"    },
-    "Swift":      { extension: "swift" },
-    "Rust":       { extension: "rs"    },
-    "Ruby":       { extension: "rb"    },
-    "PHP":        { extension: "php"   },
-    "Dart":       { extension: "dart"  },
-    "Scala":      { extension: "scala" },
-    "Elixir":     { extension: "ex"    },
-    "Erlang":     { extension: "erl"   },
-    "Racket":     { extension: "rkt"   },
-  };
 
   // creates all the options for languages in the dropdown menu
   const dropdown = document.getElementById("laguage-selection");

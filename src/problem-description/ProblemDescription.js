@@ -14,11 +14,15 @@ export class ProblemDescriptionProvider {
   /** @type {vscode.Uri} */
   extensionRoot;
 
+  /** @type {((language: string) => void) | null} */
+  onLanguageChange = null;
+
   /**
    * @param {vscode.Uri} extensionRoot Extension root path.
    */
   constructor(extensionRoot) {
     this.extensionRoot = extensionRoot;
+    this.currentLanguage = "JavaScript";
   }
 
   /**
@@ -39,6 +43,13 @@ export class ProblemDescriptionProvider {
     };
 
     this.generateHtml(viewarg.webview);
+
+    // checks for messages from the webview, and if its a setLanguage command, set the current language to the new language
+    this.view.webview.onDidReceiveMessage((message) => {
+      if (message.command === "setLanguage") {
+        this.currentLanguage = message.language;
+      }
+    });
   }
 
   /**

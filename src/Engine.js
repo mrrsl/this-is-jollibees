@@ -50,7 +50,7 @@ export class Engine {
 	constructor(extensionRootUri, solutionfilename, session, csrf) {
 		this.authenticated = false;
 		this.solutionFile = solutionfilename;
-		this.language = "JavaScript";
+		this.currentLanguage = "JavaScript";
 
 		if (session && csrf) {
 			const cred = new Credential({ csrf: csrf, session: session });
@@ -62,6 +62,14 @@ export class Engine {
 
 		this.sidePanelProvider = new LeetProblemProvider(this.apiEntry);
 		this.panelDataProvider = new ProblemDescriptionProvider(extensionRootUri);
+
+		this.panelDataProvider.onLanguageChange = async (newLanguage) => {
+			this.currentLanguage = newLanguage;
+
+			if (this.problemData) {
+				await this.createSolutionFile
+			}
+		};
 	}
 
 
@@ -92,12 +100,7 @@ export class Engine {
 		return this.sidePanelProvider;
 	}
 
-	/**
-	 * Attempt to create a solution file in the current workspace folder.
-	 *
-	 * @return {Promise<void>}
-	 */
-	async createSolutionFile() {
+	async createProblemFolder() {
 		if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
 			vscode.window.showErrorMessage("No workspace is open");
 			return;
@@ -119,8 +122,12 @@ export class Engine {
                 `Error creating ${clampFileName(this.problemData)} folder: ${error.message},`,
             );
         }
-        
-        const solutionPath = path.join(problemPath, "solution.js");
+
+		return problemPath;
+	}
+
+	async createSolutionFile(problemPath) {
+		const solutionPath = path.join(problemPath, "solution.js");
         const selectedLanguage = this.problemData.codeSnippets.filter((cs) => cs.lang == "JavaScript");
         const content = selectedLanguage[0].code;
 
@@ -141,22 +148,25 @@ export class Engine {
         } catch (error) {
             vscode.window.showErrorMessage(`Error creating solution file: ${error.message}`);
         }
-				
-				//create file with test cases
-				const testCasesPath = path.join(problemPath, "tests.js");
-				try {
-					const testContent = (await this.generateTests())?.text || "//LLM failed to respond.";
-					if (!fs.existsSync(testCasesPath)) {
-                await fs.promises.writeFile(testCasesPath, testContent);
-                vscode.window.showInformationMessage("tests file created");
-          }						
-				} catch (e) {
-					vscode.window.showErrorMessage(`lowkey i have no clue what the problem is. ${e.message}`)
-				}
+	}
+
+	async createTestsFile(problemPath) {
+		const testCasesPath = path.join(problemPath, "tests.js");
+		try {
+			const testContent = (await this.generateTests())?.text || "//LLM failed to respond.";
+			if (!fs.existsSync(testCasesPath)) {
+				await fs.promises.writeFile(testCasesPath, testContent);
+				vscode.window.showInformationMessage("Tests file created");
+			} else {
+                vscode.window.showInformationMessage("Tests have already been created!");
+            }		
+		} catch (e) {
+			vscode.window.showErrorMessage(`lowkey i have no clue what the problem is. ${e.message}`)
+		}
 
         //update panel data
         this.sendPanelData(this.problemData);
-    }
+	}
 
 	getPanelProvider() {
 		return this.panelDataProvider;
