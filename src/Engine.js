@@ -9,6 +9,8 @@ import { LeetProblemProvider, LeetHeading } from "./LeetProblemBrowse.js";
 
 import { ProblemDescriptionProvider } from "./problem-description/ProblemDescription.js";
 
+import { SlugMap } from "./SlugMap.js";
+
 /**
  * State manager for the extension. Determines if user is logged in and can access features like submitting runnable solutions
  */
@@ -101,28 +103,22 @@ export class Engine {
 			return;
 		}
 
-    // per language configuration can be done here
-    const workspacePath = vscode.workspace.workspaceFolders[0].uri.fsPath;
-    const problemPath = path.join(workspacePath, clampFileName(this.problemData));
+		// per language configuration can be done here
+		const workspacePath = vscode.workspace.workspaceFolders[0].uri.fsPath;
+		const problemPath = path.join(workspacePath, clampFileName(this.problemData));
 
-    try {
-      	if (!fs.existsSync(problemPath)) {
-        	fs.mkdirSync(problemPath);
-      	}
-    } catch (error) {
-      	vscode.window.showErrorMessage(
-        	`Error creating ${clampFileName(this.problemData)} folder: ${error.message},`,
-      	);
-    }
-    const solutionPath = path.join(problemPath, "solution.js");
-    const selectedLanguage = this.problemData.codeSnippets.filter((cs) => cs.lang == "JavaScript");
-    const content = selectedLanguage[0].code;
-
-    //create solution file
-    try {
-		if (!fs.existsSync(solutionPath)) {
-        	await fs.promises.writeFile(solutionPath, content);
+		try {
+			if (!fs.existsSync(problemPath)) {
+				fs.mkdirSync(problemPath);
+			}
+		} catch (error) {
+			vscode.window.showErrorMessage(
+				`Error creating ${clampFileName(this.problemData)} folder: ${error.message},`,
+			);
 		}
+		const solutionPath = path.join(problemPath, "solution.js");
+		const selectedLanguage = this.problemData.codeSnippets.filter((cs) => cs.lang == "JavaScript");
+		const content = selectedLanguage[0].code;
 		vscode.window.showInformationMessage("Solution file created");
 
 		const fileUri = vscode.Uri.file(solutionPath);
@@ -131,13 +127,20 @@ export class Engine {
     	viewColumn: vscode.ViewColumn.Active,
     	preview: false  // ✅ forces a permanent tab, not a preview tab
 		});
-    } catch (error) {
-		vscode.window.showErrorMessage(`Error creating solution file: ${error.message}`);
-    }
+		
+		//create solution file
+		try {
+			if (!fs.existsSync(solutionPath)) {
+				await fs.promises.writeFile(solutionPath, content);
+			}
+			vscode.window.showInformationMessage("Solution file created");
+		} catch (error) {
+			vscode.window.showErrorMessage(`Error creating solution file: ${error.message}`);
+		}
 
-    //update panel data
-    this.sendPanelData(this.problemData);
-  }
+    	//update panel data
+    	this.sendPanelData(this.problemData);
+  	}
 
 	getPanelProvider() {
 		return this.panelDataProvider;
@@ -209,6 +212,22 @@ export class Engine {
 		const response = await model.sendRequest(messages);
 
 		return response;
+	}
+
+	/**
+	 * Handles tab change events so we know what we're working on
+	 * @param {vscode.TextEditor} editor 
+	 */
+	async tabChangeHandler(editor) {
+		const filename = editor.document.uri.fsPath;
+		const directoryname = path.dirname(filename);
+
+		const matches = directoryname.match(/\d+$/);
+		const index = parseInt(matches[0]);
+		const updatedSlug = SlugMap[index - 1];
+		
+		this.problemData = await this.apiEntry.problem(updatedSlug);
+		this.sendPanelData(this.problemData);
 	}
 }
 
