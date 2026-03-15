@@ -225,5 +225,5 @@ export class Engine {
 }
 
 function clampFileName(problem) {
-	return problem.title.replace(" ", "") + ("-") + problem.questionFrontendId;
+	return problem.title.replaceAll(" ", "") + ("-") + problem.questionFrontendId;
 }
