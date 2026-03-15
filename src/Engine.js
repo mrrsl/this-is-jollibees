@@ -246,7 +246,7 @@ export class Engine {
 
 		const messages = [
 			vscode.LanguageModelChatMessage.User(`You are a software engineer trying to create test cases in` + this.currentLanguage + ` for a leetcode problem to test all general and edge cases.`),
-			vscode.LanguageModelChatMessage.User(`This is the problem description, generate me test cases for the following problem: ` + this.problemData.content)
+			vscode.LanguageModelChatMessage.User(`This is the problem description, generate me test cases for the following problem, and DO NOT respond with anything BUT the test cases: ` + this.problemData.content)
 		];
 			
 		const tokenSource = new vscode.CancellationTokenSource();
