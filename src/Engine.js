@@ -145,7 +145,7 @@ export class Engine {
 				//create file with test cases
 				const testCasesPath = path.join(problemPath, "tests.js");
 				try {
-					const testContent = (await this.generateTests(selectedLanguage[0].lang))?.text || "//LLM failed to respond.";
+					const testContent = (await this.generateTests())?.text || "//LLM failed to respond.";
 					if (!fs.existsSync(testCasesPath)) {
                 await fs.promises.writeFile(testCasesPath, testContent);
                 vscode.window.showInformationMessage("tests file created");
