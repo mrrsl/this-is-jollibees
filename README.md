@@ -1,4 +1,4 @@
-# PLPYF (Practice LeetCode Problems You Freak)
+# PLYLF (Practice LeetCode You Lazy Freak)
 
 This is a Visual Studio Code Extension that exports all LeetCode problems into Visual Studio for easier ease of access and practicing purposes. You can then import them from our extensio into your own workspace and generate test cases that will check all the edge cases for the problem.
 
